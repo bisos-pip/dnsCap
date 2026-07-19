@@ -43,7 +43,7 @@ def longDescription():
 # b:py3:pypi:setup/version Arguments  :forSys t :forPyPi t :constant "666"
 ####+BEGIN: b:py3:pypi:setup/version :comment "Auto Detected"
 
-# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.11 -- forLocalVersion=0.1 -- constant=NA
+# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.1 -- forLocalVersion=0.1 -- constant=NA
 def pkgVersion():
         return '0.1'
 
@@ -52,7 +52,7 @@ def pkgVersion():
 # b:py3:pypi:setup/requires :extras ; :requirements "requirements.txt" (bring here requirements.txt)
 ####+BEGIN: b:py3:pypi:setup/requires :extras ()
 
-requires = [
+requires = [ 
 "bisos",
 "bisos.b",
 "bisos.common",
@@ -66,29 +66,25 @@ requires = [
 # b:py3:pypi:setup/scripts :comment
 ####+BEGIN: b:py3:pypi:setup/scripts :comment ""
 
-scripts = [
-'bin/bxoGitlab.cs',
-'bin/gitist.cs',
-'bin/pub-anon-github-gitist.pcs',
-'bin/pub-anon-gitlab-gitist.pcs',
-'bin/pub-auth-github-gitist.pcs',
-'bin/pub-auth-gitlab-gitist.pcs',
+scripts = [ 
+'bin/capDns_seed.cs',
+'bin/exmpl-here-dns.pcs',
 ]
 ####+END:
 
 # b:py3:pypi:setup/dataFiles :comment
 ####+BEGIN: b:py3:pypi:setup/dataFiles :comment "Instead of ./MANIFEST.in or in pyproject.toml"
 
-data_files = [
+data_files = [ 
 ('',  ['lh-agpl3-LICENSE.txt', '_description.org', 'README.rst']),
 ]
 ####+END:
 
 # :pkgName "--auto--"  --- results in use of name=pkgName(),
-####+BEGIN: b:py3:pypi:setup/funcArgs :comment "defaults to --auto--"
+####+BEGINNOT: b:py3:pypi:setup/funcArgs :comment "defaults to --auto--"
 
 setuptools.setup(
-    name=pkgName(),  # 'bisos.gitist'
+    name=pkgName(),  # 'bisos.capDns'
     version=pkgVersion(),
     packages=setuptools.find_packages(),
     scripts=scripts,
@@ -106,7 +102,6 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries',

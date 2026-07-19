@@ -35,24 +35,34 @@ Goal: Confirm AI's understanding of the context and capture that in [[Context Co
 
 * Stage 1 TODOs
 ** +
-** TODO [#A] <<Context Confirmation>> for AI (typically triggered by /bx-confirm0) :ai:
+** DONE [#A] <<Context Confirmation>> for AI (typically triggered by /bx-confirm0) :ai:
 SCHEDULED: <2026-06-09 Tue>
+CLOSED: [2026-07-18 Fri]
 Based on the series of files starting from CLAUDE.md in this repo,
 describe succinctly what you have understood.
 Enumerate explicitly which files you have imported and which you have considered.
 ----- AI Results: ------
+Imported: CLAUDE.md (safe-copy) → AI-WORKFLOW.org (symlink→mother/) →
+AI-Activity.org (symlink→bisos-pip/) → AI-DevStatus.org (sparse, per-project) →
+AI-WorkPlan.org (per-project).
+
+This is the =bisos.capDns= pip package (bisos-pip activity), responsible for
+managing DNS capability entries for BISOS services. Currently marked NOTYET /
+under construction. Source at =py3/bisos/capDns/= (3 modules), seed command at
+=py3/bin/capDns_seed.cs=, example =-dns.pcs= included. Conventions: CamelCase,
+pathlib, type hints; developer handles all commits/pushes.
 ** -
 
-* Stage 2: Description of This Stage Comes Here
+* Stage 2: Convert the Starting Point Which Was Copied from bisos.gitist and make it minimally functional
 
-Goal: Describe what the goal of this stage is.
+Goal: A Very Basic Starting Point For Here Processing
 
 
 * Stage 2 TODOs
 ** +
-** TODO [#A] Example of a work-item for AI :ai:
+** TODO [#A] Convert all <<gitist to capDns>> --- Dont change any functionality :ai:
 SCHEDULED: <2026-06-09 Tue>
-Description of a work-item
+In py3/bin change all the imports and usages to be capDns. This will result in the seed and planted seed to be named capDns but actually function same as gitist. Based on that working starting point, we can then do needed modifications. Changes are also required in the py3/bisos/capDns directory. We wont be able to test .cs and .pcs files yet because local install of the package has not occured yet. Just do the string replacements for this TODO.
 ----- AI Results: ------
 ** -
 

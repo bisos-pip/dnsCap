@@ -28,8 +28,8 @@
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_seed.py
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_seed.py
+** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seed.py
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seed.py
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -41,7 +41,7 @@
 if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
 csInfo['version'] = '202606051742'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'gitist_seed-Panel.org'
+csInfo['panel'] = 'capDns_seed-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -85,11 +85,11 @@ import atexit
 
 from bisos.csSeed import seedsLib
 
-seedCSMU = 'gitist.cs'
+seedCSMU = 'capDns_seed.cs'
 
-####+BEGIN: b:py3:cs:func/typing :funcName "atexit_plantWithWhich" :funcType "extTyped" :comment "expects gitist.cs" :deco "atexit.register"
+####+BEGIN: b:py3:cs:func/typing :funcName "atexit_plantWithWhich" :funcType "extTyped" :comment "expects capDns_seed.cs" :deco "atexit.register"
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-extTyped [[elisp:(outline-show-subtree+toggle)][||]] /atexit_plantWithWhich/  expects gitist.cs deco=atexit.register  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-extTyped [[elisp:(outline-show-subtree+toggle)][||]] /atexit_plantWithWhich/  expects capDns_seed.cs deco=atexit.register  [[elisp:(org-cycle)][| ]]
 #+end_org """
 @atexit.register
 def atexit_plantWithWhich(

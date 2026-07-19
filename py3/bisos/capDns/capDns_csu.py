@@ -28,8 +28,8 @@
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_csu.py
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_csu.py
+** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_csu.py
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_csu.py
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -41,7 +41,7 @@
 if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
 csInfo['version'] = '202606053019'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'gitist_csu-Panel.org'
+csInfo['panel'] = 'capDns_csu-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -104,7 +104,7 @@ import gitlab
 import github
 from github import Github, Auth
 
-from bisos.gitist import gitist_seedInfo
+from bisos.capDns import capDns_seedInfo
 
 import logging
 log = logging.getLogger(__name__)
@@ -208,7 +208,7 @@ def getGitlab(
     """ #+begin_org
 ** Build a python-gitlab client from =cmndsControlInfo= (=serverConfigTag=, =serverConfigPath=).
     #+end_org """
-    ci = gitist_seedInfo.cmndsControlInfo
+    ci = capDns_seedInfo.cmndsControlInfo
     cfgPath = str(pathlib.Path(ci.serverConfigPath).expanduser())
     gl = gitlab.Gitlab.from_config(ci.serverConfigTag, [cfgPath])
     return gl
@@ -220,7 +220,7 @@ def _githubCfg():
     When serverConfigTag is unset, fall back to the [global] default tag (like
     python-gitlab's gitlab cfg), then to "default".
     """
-    ci = gitist_seedInfo.cmndsControlInfo
+    ci = capDns_seedInfo.cmndsControlInfo
     cfgPath = pathlib.Path(ci.serverConfigPath).expanduser()
     parser = configparser.ConfigParser()
     parser.read(str(cfgPath))
@@ -247,7 +247,7 @@ def getGithub() -> Github:
 
 @dataclass
 class RepoRef:
-    """ Brand-neutral repo descriptor used by all gitist commands. """
+    """ Brand-neutral repo descriptor used by all capDns commands. """
     namespacePath: str          # on-disk relative path (gitlab path_with_namespace / github full_name)
     httpUrl: str
     sshUrl: str
@@ -256,7 +256,7 @@ class RepoRef:
 
 
 def _brand():
-    return gitist_seedInfo.cmndsControlInfo.brand
+    return capDns_seedInfo.cmndsControlInfo.brand
 
 
 def _gitlabProjectToRef(proj) -> RepoRef:
@@ -282,10 +282,10 @@ def _githubRepoToRef(repo) -> RepoRef:
 def listRepos(namePath: str) -> list:
     """ List repos under an account path -> [RepoRef]. Brand-dispatched. """
     brand = _brand()
-    if brand == gitist_seedInfo.GitProviderBrand.Gitlab:
+    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
         group = getGitlab().groups.get(namePath)
         return [_gitlabProjectToRef(p) for p in group.projects.list(get_all=True)]
-    if brand == gitist_seedInfo.GitProviderBrand.Github:
+    if brand == capDns_seedInfo.GitProviderBrand.Github:
         gh = getGithub()
         try:
             owner = gh.get_organization(namePath)      # try org first
@@ -298,9 +298,9 @@ def listRepos(namePath: str) -> list:
 def getRepo(repoPath: str) -> RepoRef:
     """ Resolve a single repo by full path -> RepoRef. Brand-dispatched. """
     brand = _brand()
-    if brand == gitist_seedInfo.GitProviderBrand.Gitlab:
+    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
         return _gitlabProjectToRef(getGitlab().projects.get(repoPath))
-    if brand == gitist_seedInfo.GitProviderBrand.Github:
+    if brand == capDns_seedInfo.GitProviderBrand.Github:
         return _githubRepoToRef(getGithub().get_repo(repoPath))
     raise NotImplementedError(f"getRepo not implemented for brand {brand}")
 
@@ -308,9 +308,9 @@ def getRepo(repoPath: str) -> RepoRef:
 def authToken():
     """ The access token for the current brand (for https-auth clone URLs). """
     brand = _brand()
-    if brand == gitist_seedInfo.GitProviderBrand.Gitlab:
+    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
         return getGitlab().private_token
-    if brand == gitist_seedInfo.GitProviderBrand.Github:
+    if brand == capDns_seedInfo.GitProviderBrand.Github:
         return _githubCfg()[1]
     raise NotImplementedError(f"authToken not implemented for brand {brand}")
 
@@ -318,18 +318,18 @@ def authToken():
 def _httpsCredPrefix(token) -> str:
     """ Userinfo to inject into an https clone URL, per brand. """
     brand = _brand()
-    if brand == gitist_seedInfo.GitProviderBrand.Gitlab:
+    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
         return f"oauth2:{token}@"
-    if brand == gitist_seedInfo.GitProviderBrand.Github:
+    if brand == capDns_seedInfo.GitProviderBrand.Github:
         return f"{token}@"
     raise NotImplementedError(f"_httpsCredPrefix not implemented for brand {brand}")
 
 
 def cloneUrlForRef(ref: RepoRef) -> str:
     """ Choose the clone URL for a RepoRef per cmndsControlInfo access policy. """
-    ci = gitist_seedInfo.cmndsControlInfo
-    GAT = gitist_seedInfo.GitAccessType
-    GAM = gitist_seedInfo.GitAuthAccessMethod
+    ci = capDns_seedInfo.cmndsControlInfo
+    GAT = capDns_seedInfo.GitAccessType
+    GAM = capDns_seedInfo.GitAuthAccessMethod
 
     if ci.gitAccessType == GAT.Auth:
         if ci.gitAuthAccessMethod in (GAM.Ssh, GAM.SshOverHttps):
@@ -366,11 +366,11 @@ def cloneRef(ref: RepoRef, baseDir: pathlib.Path) -> dict:
     return {"path": ref.namespacePath, "dest": str(dest), "status": "cloned"}
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "gitist_reposList" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_reposList" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<gitist_reposList>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_reposList>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class gitist_reposList(cs.Cmnd):
+class capDns_reposList(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -395,7 +395,7 @@ class gitist_reposList(cs.Cmnd):
         self.captureRunStr(""" #+begin_org
 *** Run Results
 #+begin_src sh :results output :session shared
-gitlab-pub-gitist.pcs -i gitist_reposList mohsen.byname-group
+gitlab-pub-capDns.pcs -i capDns_reposList mohsen.byname-group
   #+end_src
 #+RESULTS:
 : 79388111 mohsen.byname-group/mohsen.byname-project
@@ -442,11 +442,11 @@ gitlab-pub-gitist.pcs -i gitist_reposList mohsen.byname-group
         return cmndArgsSpecDict
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "gitist_reposClone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_reposClone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<gitist_reposClone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_reposClone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class gitist_reposClone(cs.Cmnd):
+class capDns_reposClone(cs.Cmnd):
     cmndParamsMandatory = [ 'destBaseDir', ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -472,11 +472,11 @@ class gitist_reposClone(cs.Cmnd):
         self.captureRunStr(""" #+begin_org
 *** Run Results
 #+begin_src sh :results output :session shared
-gitlab-pub-gitist.pcs -i gitist_reposClone --destBaseDir=/tmp/gitistTest mohsen.byname-group
+gitlab-pub-capDns.pcs -i capDns_reposClone --destBaseDir=/tmp/capDnsTest mohsen.byname-group
   #+end_src
 #+RESULTS:
-: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/gitistTest/mohsen.byname-group/mohsen.byname-project
-: [{'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/gitistTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}]
+: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project
+: [{'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}]
         #+end_org """)
 
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
@@ -517,11 +517,11 @@ gitlab-pub-gitist.pcs -i gitist_reposClone --destBaseDir=/tmp/gitistTest mohsen.
         return cmndArgsSpecDict
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "gitist_clone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_clone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<gitist_clone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_clone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class gitist_clone(cs.Cmnd):
+class capDns_clone(cs.Cmnd):
     cmndParamsMandatory = [ 'destBaseDir', ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -547,11 +547,11 @@ class gitist_clone(cs.Cmnd):
         self.captureRunStr(""" #+begin_org
 *** Run Results
 #+begin_src sh :results output :session shared
-gitlab-pub-gitist.pcs -i gitist_clone --destBaseDir=/tmp/gitistTest mohsen.byname-group/mohsen.byname-project
+gitlab-pub-capDns.pcs -i capDns_clone --destBaseDir=/tmp/capDnsTest mohsen.byname-group/mohsen.byname-project
   #+end_src
 #+RESULTS:
-: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/gitistTest/mohsen.byname-group/mohsen.byname-project
-: {'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/gitistTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}
+: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project
+: {'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}
         #+end_org """)
 
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)

@@ -9,32 +9,32 @@ import collections
 
 from bisos.csSeed import seedsLib
 
-from bisos.gitist import gitist_seed #  noqa: F401  # type: ignore[unused-import] _atExit_
+from bisos.capDns import capDns_seed #  noqa: F401  # type: ignore[unused-import] _atExit_
 
-from bisos.gitist import gitist_seedInfo
-cntrlInfo = gitist_seedInfo.cmndsControlInfo
+from bisos.capDns import capDns_seedInfo
+cntrlInfo = capDns_seedInfo.cmndsControlInfo
 
-cntrlInfo.brand = gitist_seedInfo.GitProviderBrand.Github
+cntrlInfo.brand = capDns_seedInfo.GitProviderBrand.Github
 cntrlInfo.serverConfigPath = "~/credentials/githubHosts.cfg"
 cntrlInfo.serverConfigTag = "default"
 
-cntrlInfo.gitAccessType = gitist_seedInfo.GitAccessType.Anon
+cntrlInfo.gitAccessType = capDns_seedInfo.GitAccessType.Anon
 # For authenticated cloning, flip to Auth and pick a method + ssh acct:
-# cntrlInfo.gitAccessType = gitist_seedInfo.GitAccessType.Auth
-# cntrlInfo.gitAuthAccessMethod = gitist_seedInfo.GitAuthAccessMethod.Ssh
+# cntrlInfo.gitAccessType = capDns_seedInfo.GitAccessType.Auth
+# cntrlInfo.gitAuthAccessMethod = capDns_seedInfo.GitAuthAccessMethod.Ssh
 # cntrlInfo.gitAccessAcct = "github-mohsen"   # Host alias in ~/.ssh/config
 
 from bisos.csSeed import csCmndsList_seedInfo
 csCmnd = csCmndsList_seedInfo.csCmnd
 
 csCmndsList = [
-    csCmnd("gitist_reposList",  args="bisos-pip", doContinue=True),
-    csCmnd("gitist_reposClone",
-           pars=collections.OrderedDict([("destBaseDir", "~/gitistClone/github/anon")]),
+    csCmnd("capDns_reposList",  args="bisos-pip", doContinue=True),
+    csCmnd("capDns_reposClone",
+           pars=collections.OrderedDict([("destBaseDir", "~/capDnsClone/github/anon")]),
            args="bisos-pip", doContinue=True),
-    csCmnd("gitist_clone",
-           pars=collections.OrderedDict([("destBaseDir", "~/gitistClone/github/anon")]),
-           args="bisos-pip/gitist", doContinue=True),
+    csCmnd("capDns_clone",
+           pars=collections.OrderedDict([("destBaseDir", "~/capDnsClone/github/anon")]),
+           args="bisos-pip/capDns", doContinue=True),
 ]
 
 csCmndsList_seedInfo.setup(

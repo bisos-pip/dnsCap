@@ -1,19 +1,19 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
-import typing ; csInfo: typing.Dict[str, typing.Any] = {'category': 'csxu', 'name': 'gitist.cs', 'features': ['direct', 'uploader', 'seeded']}
+import typing ; csInfo: typing.Dict[str, typing.Any] = {'category': 'csxu', 'name': 'capDns_seed.cs', 'features': ['direct', 'uploader', 'seeded']}
 
 csInfo['summary'] = """ #+begin_org
 * ~[Summary]~ :: A =CmndSvc= (Pkged, Direct, Seeded, Uploadable) seed for git mass-cloning of github and gitlab.
 #+end_org """
 
 csInfo['description'] = """ #+begin_org
-* [[elisp:(org-cycle)][| ~csInfoDescription~ |]] :: The gitist seed. Plants (e.g. =pubGitlab-gitist.pcs=) extend it
+* [[elisp:(org-cycle)][| ~csInfoDescription~ |]] :: The capDns seed. Plants (e.g. =pubGitlab-capDns.pcs=) extend it
 to clone across github and gitlab (public and private) instances.
 #+end_org """
 
 """ #+begin_org
-* [[elisp:(org-cycle)][| ~DevDescription~ |]] :: [[file:/bisos/git/bxRepos/bisos-pip/gitist/py3/panels/bisos.gitist/_nodeBase_/fullUsagePanel-en.org][BISOS Panel]]   [[elisp:(org-cycle)][| ]]
+* [[elisp:(org-cycle)][| ~DevDescription~ |]] :: [[file:/bisos/git/bxRepos/bisos-pip/capDns/py3/panels/bisos.capDns/_nodeBase_/fullUsagePanel-en.org][BISOS Panel]]   [[elisp:(org-cycle)][| ]]
 
 ** Status: In use with BISOS
 ** /[[elisp:(org-cycle)][| Planned Improvements |]]/ :
@@ -44,8 +44,8 @@ to clone across github and gitlab (public and private) instances.
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/gitist/py3/bin/gitist.cs
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/gitist/py3/bin/gitist.cs
+** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bin/capDns_seed.cs
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bin/capDns_seed.cs
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -54,10 +54,10 @@ to clone across github and gitlab (public and private) instances.
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars-csInfo |]]*
 #+end_org """
-if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['gitist'], }
+if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['capDns'], }
 csInfo['version'] = '202509285407'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'gitist-Panel.org'
+csInfo['panel'] = 'capDns-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -117,13 +117,13 @@ if seedsLib.seededCsxuInfo.plantOfThisSeed is not None:
 (setq  b:py:cs:csuList
   (list
    "bisos.csPlayer.csxuFps_csu"
-   "bisos.gitist.gitist_csu"
+   "bisos.capDns.capDns_csu"
    "bisos.csSeed.csCmndsList_csu"
    "plantedCsu"
  ))
 #+END_SRC
 #+RESULTS:
-| bisos.csPlayer.csxuFps_csu | bisos.gitist.gitist_csu | bisos.csSeed.csCmndsList_csu | plantedCsu |
+| bisos.csPlayer.csxuFps_csu | bisos.capDns.capDns_csu | bisos.csSeed.csCmndsList_csu | plantedCsu |
 #+end_org """
 
 ####+BEGIN: b:py3:cs:framework/csuListImportPlus :pyImports t :csuImports t :csuParams t :csmuParams nil
@@ -132,10 +132,10 @@ if seedsLib.seededCsxuInfo.plantOfThisSeed is not None:
 #+end_org """
 
 from bisos.csPlayer import csxuFps_csu
-from bisos.gitist import gitist_csu
+from bisos.capDns import capDns_csu
 from bisos.csSeed import csCmndsList_csu
 
-csuList = [ 'bisos.csPlayer.csxuFps_csu', 'bisos.gitist.gitist_csu', 'bisos.csSeed.csCmndsList_csu', 'plantedCsu', ]
+csuList = [ 'bisos.csPlayer.csxuFps_csu', 'bisos.capDns.capDns_csu', 'bisos.csSeed.csCmndsList_csu', 'plantedCsu', ]
 
 if seedsLib.seededCsxuInfo.plantOfThisSeed is None:
     csuList.remove('plantedCsu')

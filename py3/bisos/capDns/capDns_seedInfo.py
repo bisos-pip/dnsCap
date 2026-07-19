@@ -28,8 +28,8 @@
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_seedInfo.py
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/gitist/py3/bisos/gitist/gitist_seedInfo.py
+** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seedInfo.py
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seedInfo.py
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -41,7 +41,7 @@
 if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
 csInfo['version'] = '202606051605'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'gitist_seedInfo-Panel.org'
+csInfo['panel'] = 'capDns_seedInfo-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -153,12 +153,12 @@ class CmndsControlInfo(object):
 cmndsControlInfo = CmndsControlInfo()
 
 
-####+BEGIN: b:py3:class/decl :className "GitistSeedInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"
+####+BEGIN: b:py3:class/decl :className "CapDnsSeedInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Cls-basic  [[elisp:(outline-show-subtree+toggle)][||]] /GitistSeedInfo/  superClass=object =Abstraction of a  Interface=  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Cls-basic  [[elisp:(outline-show-subtree+toggle)][||]] /CapDnsSeedInfo/  superClass=object =Abstraction of a  Interface=  [[elisp:(org-cycle)][| ]]
 #+end_org """
 @dataclass
-class GitistSeedInfo(object):
+class CapDnsSeedInfo(object):
 ####+END:
     """
 ** Abstraction of
@@ -187,7 +187,7 @@ class GitistSeedInfo(object):
 ####+END:
 
 # Singleton Instantiation
-gitistSeedInfo = GitistSeedInfo()
+capDnsSeedInfo = CapDnsSeedInfo()
 
 ####+BEGIN: bx:cs:py3:section :title "Public Functions"
 """ #+begin_org
@@ -209,11 +209,11 @@ def setup(
 ** [[elisp:(org-cycle)][| *DocStr | ]
     #+end_org """
     if examplesFuncsList is not None:
-        gitistSeedInfo.examplesFuncsList  = examplesFuncsList
+        capDnsSeedInfo.examplesFuncsList  = examplesFuncsList
         cmnds_seedInfo.setup(
             examplesFuncsList=examplesFuncsList,
         )
-    gitistSeedInfo.placeHolder = placeHolder
+    capDnsSeedInfo.placeHolder = placeHolder
 
 
 ####+BEGIN: b:py3:cs:framework/endOfFile :basedOn "classification"
