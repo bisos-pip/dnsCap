@@ -1,0 +1,140 @@
+#+title: bisos.gitist:  Git Mass Cloning and More
+#+DATE: <2026-06-05 Fri 16:59>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+
+#+BEGIN: b:org:pypi:readme/topControls :pkgName "gitist" :comment "basic"
+
+|----------------------+------------------------------------------------------------------|
+| ~Blee Panel Controls~: | [[elisp:(show-all)][Show-All]] : [[elisp:(org-shifttab)][Overview]] : [[elisp:(progn (org-shifttab) (org-content))][Content]] : [[elisp:(delete-other-windows)][(1)]] : [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]] : [[elisp:(save-buffer)][Save]]  : [[elisp:(kill-buffer)][Quit]]  : [[elisp:(bury-buffer)][Bury]] |
+| ~Panel Links~:         | [[file:./py3/panels/bisos.gitist/_nodeBase_/fullUsagePanel-en.org][Repo Blee Panel]] --  [[file:/bisos/git/bxRepos/bisos-pip/gitist/py3/panels/bisos.gitist/_nodeBase_/fullUsagePanel-en.org][Blee Panel]]                                   |
+| ~See Also~:            | [[https://pypi.org/project/bisos.gitist][At PYPI]] : [[https://github.com/bisos-pip/pycs][bisos.PyCS]]                                             |
+|----------------------+------------------------------------------------------------------|
+
+#+END:
+
+* Overview
+
+/bisos.gitist/ provides general facilities for mass cloning of public github and gitlab
+and also private gitlab instances.
+
+bisos.gitist is a python package that uses the  [[https://github.com/bisos-pip/pycs][PyCS-Framework]].
+
+gitist.cs is a seed. Common usages of gitist take the form of a gitistProc.pcs.
+
+
+
+* Table of Contents     :TOC:
+- [[#overview][Overview]]
+- [[#gitist-layers][Gitist Layers]]
+- [[#post-installation-setup][Post-Installation Setup]]
+- [[#installation][Installation]]
+  - [[#installation-with-pip][Installation With pip]]
+  - [[#installation-with-pipx][Installation With pipx]]
+- [[#usage][Usage]]
+  - [[#local-usage-system-command-line][Local Usage (system command-line)]]
+- [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
+  - [[#bisosgitist-blee-panels][bisos.gitist Blee-Panels]]
+- [[#support][Support]]
+- [[#planned-improvements][Planned Improvements]]
+
+* Gitist Layers
+
+1) PyCS Framework
+2) Seeded/Planted PyCS Framework (gitist.cs)
+3) Common csCmndsList (bisos.csSeed)
+4) Gitist Commands CSUs
+
+
+* Post-Installation Setup
+
+After installing, run the provisioning script to create the credentials directory
+and place the configuration templates:
+
+#+begin_src bash
+config/provision.pcs -i credsSetup
+#+end_src
+
+This creates =~/credentials/git/= and copies two config files there if they do
+not already exist:
+
+- =~/credentials/git/githubHosts.cfg= — GitHub configuration; insert your GitHub PAT (Personal Access Token) here.
+- =~/credentials/git/gitlabHosts.cfg= — GitLab configuration; insert your GitLab PAT here.
+
+Once the PATs are in place, you can run the gitist proc scripts, e.g.:
+
+#+begin_src bash
+bin/github-pub-gitist.pcs
+bin/gitlab-pub-gitist.pcs
+#+end_src
+
+
+* Installation
+
+The sources for the bisos.gitist pip package are maintained at:
+https://github.com/bisos-pip/gitist.
+
+The bisos.gitist pip package is available at PYPI as
+https://pypi.org/project/bisos.gitist
+
+You can install bisos.gitist with pip or pipx.
+
+** Installation With pip
+
+If you need access to bisos.gitist as a python module, you can install it with pip:
+
+#+begin_src bash
+pip install bisos.gitist
+#+end_src
+
+** Installation With pipx
+
+If you only need access to bisos.gitist on command-line, you can install it with pipx:
+
+#+begin_src bash
+pipx install bisos.gitist
+#+end_src
+
+* Usage
+
+** Local Usage (system command-line)
+
+=gitist.cs= does the equivalent of gitist.
+
+#+begin_src bash
+bin/gitist.cs
+bin/gitistProc.pcs
+#+end_src
+
+
+* Documentation and Blee-Panels
+
+bisos.gitist is part of ByStar Digital Ecosystem [[http://www.by-star.net]].
+
+This module's primary documentation is in the form of Blee-Panels.
+Additional information is also available in: [[http://www.by-star.net/PLPC/180047]]
+
+** bisos.gitist Blee-Panels
+
+bisos.gitist Blee-Panles are in ./panels directory.
+From within Blee and BISOS these panles are accessible under the
+Blee "Panels" menu.
+
+See [[file:./py3/panels/_nodeBase_/fullUsagePanel-en.org]] for a starting point.
+
+* Support
+
+For support, criticism, comments and questions; please contact the
+author/maintainer\\
+[[http://mohsen.1.banan.byname.net][Mohsen Banan]] at:
+[[http://mohsen.1.banan.byname.net/contact]]
+
+
+* Planned Improvements
+
+- Enumerate applicabilities: telecom/SON, datacenter, CMIP-MOs
+- py3/bisos/gitist/tocsModule_csu.py
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:
