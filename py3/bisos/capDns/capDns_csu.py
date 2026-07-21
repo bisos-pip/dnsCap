@@ -77,10 +77,9 @@ With BISOS, it is used in CMDB remotely.
 #+end_org """
 ####+END:
 
-# import os
 import collections
-# import pathlib
-# import invoke
+import typing
+import subprocess
 
 ####+BEGIN: b:py3:cs:framework/imports :basedOn "classification"
 """ #+begin_org
@@ -93,16 +92,6 @@ from bisos.common import csParam
 
 import collections
 ####+END:
-
-import pathlib
-import enum
-import subprocess
-import configparser
-from dataclasses import dataclass
-
-import gitlab
-import github
-from github import Github, Auth
 
 from bisos.capDns import capDns_seedInfo
 
@@ -131,16 +120,7 @@ def commonParamsSpecify(
 ####+END:
         csParams: cs.param.CmndParamDict,
 ) -> None:
-    csParams.parDictAdd(
-        parName='destBaseDir',
-        parDescription="Destination base directory under which repos are cloned (mirroring path_with_namespace).",
-        parDataType=None,
-        parDefault=None,
-        parChoices=list(),
-        argparseShortOpt=None,
-        argparseLongOpt='--destBaseDir',
-    )
-
+    pass
 
 
 ####+BEGIN: blee:bxPanel:foldingSection :outLevel 0 :sep nil :title "Direct Command Services" :anchor ""  :extraInfo "Examples and CSs"
@@ -149,11 +129,37 @@ def commonParamsSpecify(
 #+end_org """
 ####+END:
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "examples_csu" :comment "" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv "pyKwArgs"
+####+BEGIN: b:py3:cs:func/typing :funcName "examples_csu" :comment "~CSU Specification~" :funcType "eType" :retType "" :deco "default" :argsList ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<examples_csu>>  =verify= ro=cli pyInv=pyKwArgs   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-eType  [[elisp:(outline-show-subtree+toggle)][||]] /examples_csu/  ~CSU Specification~ deco=default  [[elisp:(org-cycle)][| ]]
 #+end_org """
-class examples_csu(cs.Cmnd):
+@cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+def examples_csu(
+####+END:
+        sectionTitle: typing.AnyStr = '',
+) -> None:
+    """ #+begin_org
+** [[elisp:(org-cycle)][| *DocStr* |]] Examples of capDns commands.
+    #+end_org """
+
+    cmnd = cs.examples.cmndEnter
+
+    if sectionTitle == 'default':
+        cs.examples.menuChapter('*BISOS DNS Capability Commands*')
+
+    cs.examples.menuSection('/DNS Capability Commands/')
+    cmnd('capDns_update',   comment="# Update /etc/hosts dblock (sudo)")
+    cmnd('capDns_verify',   comment="# Verify /etc/hosts has the banna dblock")
+    cmnd('capDns_resolve',  comment="# Resolve fqdn via getent hosts")
+    cmnd('capDns_fqdnPing', comment="# Ping fqdn once")
+    cmnd('capDns_fqdnPing', comment="ping airflow.here  # Direct ping to verify /etc/hosts entry")
+
+
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_update" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_update>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+#+end_org """
+class capDns_update(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
@@ -162,7 +168,6 @@ class examples_csu(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             pyKwArgs: typing.Any=None,   # pyInv Argument
     ) -> b.op.Outcome:
 
         failed = b_io.eh.badOutcome
@@ -171,206 +176,95 @@ class examples_csu(cs.Cmnd):
             return failed(cmndOutcome)
 ####+END:
         self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Basic example command.
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Add/update the DNS entry for =fqdn= per =dnsSpecMethod=.
         #+end_org """)
 
-        self.captureRunStr(""" #+begin_org
-*** Run Results
-#+begin_src sh :results output :session shared
-facterModule.cs -i examples 
-  #+end_src
-#+RESULTS:
-#+begin_example
-#+end_example
+        import pathlib
+        import datetime
+        import shutil
 
-        #+end_org """)
+        ci = capDns_seedInfo.cmndsControlInfo
+        hostsFile = pathlib.Path('/etc/hosts')
 
-        od = collections.OrderedDict
-        cmnd = cs.examples.cmndEnter
-        literal = cs.examples.execInsert
+        dateTag = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        backupFile = pathlib.Path(f'/etc/hosts.{dateTag}')
 
-        #  -v 1 --callTrackings monitor+ --callTrackings invoke+
-        pars_debug_verbosity = od([('verbosity', "1"),])
-        pars_debug_monitor = od([('callTrackings', "monitor+"),])
-        pars_debug_invoke = od([('callTrackings', "invoke+"),])
-        pars_debug_full = (pars_debug_verbosity | pars_debug_monitor | pars_debug_invoke)
+        copyResult = subprocess.run(
+            ['sudo', 'cp', str(hostsFile), str(backupFile)],
+            capture_output=True, text=True,
+        )
+        if copyResult.returncode != 0:
+            b_io.ann.note(f"ERROR: failed to backup /etc/hosts: {copyResult.stderr}")
+            return failed(cmndOutcome)
+        b_io.ann.note(f"Backed up /etc/hosts to {backupFile}")
 
-        return(cmndOutcome)
+        import sys
+
+        pyDblockCs = shutil.which('py-dblock.cs')
+        if not pyDblockCs:
+            b_io.ann.note("ERROR: py-dblock.cs not found in PATH")
+            return failed(cmndOutcome)
+
+        import os
+        updateResult = subprocess.run(
+            ['sudo', '-E', f'PATH={os.environ.get("PATH", "")}',
+             sys.executable, pyDblockCs, '-i', 'updateDblocks', str(hostsFile)],
+            capture_output=True, text=True,
+        )
+        if updateResult.returncode != 0:
+            b_io.ann.note(f"ERROR: py-dblock.cs failed: {updateResult.stderr}")
+            return failed(cmndOutcome)
+        b_io.ann.note(f"Updated /etc/hosts for {ci.fqdn}")
+
+        return cmndOutcome.set(opError=b.OpError.Success)
 
 
-####+BEGIN: b:py3:cs:func/typing :funcName "getGitlab" :comment "~CSU Specification~" :funcType "ParSpc" :deco ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_verify" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-ParSpc [[elisp:(outline-show-subtree+toggle)][||]] /getGitlab/  ~CSU Specification~  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_verify>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-def getGitlab(
+class capDns_verify(cs.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+             rtInv: cs.RtInvoker,
+             cmndOutcome: b.op.Outcome,
+    ) -> b.op.Outcome:
+
+        failed = b_io.eh.badOutcome
+        callParamsDict = {}
+        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
+            return failed(cmndOutcome)
 ####+END:
-) -> gitlab.Gitlab:
-    """ #+begin_org
-** Build a python-gitlab client from =cmndsControlInfo= (=serverConfigTag=, =serverConfigPath=).
-    #+end_org """
-    ci = capDns_seedInfo.cmndsControlInfo
-    cfgPath = str(pathlib.Path(ci.serverConfigPath).expanduser())
-    gl = gitlab.Gitlab.from_config(ci.serverConfigTag, [cfgPath])
-    return gl
+        self.cmndDocStr(f""" #+begin_org
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Verify the DNS entry for =fqdn= exists per =dnsSpecMethod=.
+        #+end_org """)
+
+        hostsContent = open('/etc/hosts').read()
+        hasBegin = '####+BEGIN:' in hostsContent
+        hasEnd = '####+END:' in hostsContent
+
+        if hasBegin and hasEnd:
+            b_io.ann.note("capDns_verify: /etc/hosts has banna dblock (BEGIN and END markers present)")
+            return cmndOutcome.set(opError=b.OpError.Success)
+        else:
+            missing = []
+            if not hasBegin:
+                missing.append('####+BEGIN:')
+            if not hasEnd:
+                missing.append('####+END:')
+            b_io.ann.note(f"capDns_verify: FAIL -- /etc/hosts missing: {', '.join(missing)}")
+            return failed(cmndOutcome)
 
 
-def _githubCfg():
-    """ Read (url, token) from the github cfg INI at serverConfigPath[serverConfigTag].
-
-    When serverConfigTag is unset, fall back to the [global] default tag (like
-    python-gitlab's gitlab cfg), then to "default".
-    """
-    ci = capDns_seedInfo.cmndsControlInfo
-    cfgPath = pathlib.Path(ci.serverConfigPath).expanduser()
-    parser = configparser.ConfigParser()
-    parser.read(str(cfgPath))
-    tag = ci.serverConfigTag
-    if not tag and parser.has_section("global"):
-        tag = parser["global"].get("default")
-    tag = tag or "default"
-    section = parser[tag] if parser.has_section(tag) else {}
-    url = section.get("url") or None          # absent => public github.com
-    token = section.get("token") or None
-    return url, token
-
-
-def getGithub() -> Github:
-    """ Build a PyGithub client from cmndsControlInfo (serverConfigTag, serverConfigPath). """
-    url, token = _githubCfg()
-    kwargs = {}
-    if url:
-        kwargs["base_url"] = url
-    if token:
-        kwargs["auth"] = Auth.Token(token)
-    return Github(**kwargs)
-
-
-@dataclass
-class RepoRef:
-    """ Brand-neutral repo descriptor used by all capDns commands. """
-    namespacePath: str          # on-disk relative path (gitlab path_with_namespace / github full_name)
-    httpUrl: str
-    sshUrl: str
-    private: bool = False
-    ident: object = None        # provider id (gitlab project id / github repo id)
-
-
-def _brand():
-    return capDns_seedInfo.cmndsControlInfo.brand
-
-
-def _gitlabProjectToRef(proj) -> RepoRef:
-    return RepoRef(
-        namespacePath=proj.path_with_namespace,
-        httpUrl=proj.http_url_to_repo,
-        sshUrl=proj.ssh_url_to_repo,
-        private=(proj.visibility != "public"),
-        ident=proj.id,
-    )
-
-
-def _githubRepoToRef(repo) -> RepoRef:
-    return RepoRef(
-        namespacePath=repo.full_name,
-        httpUrl=repo.clone_url,
-        sshUrl=repo.ssh_url,
-        private=repo.private,
-        ident=repo.id,
-    )
-
-
-def listRepos(namePath: str) -> list:
-    """ List repos under an account path -> [RepoRef]. Brand-dispatched. """
-    brand = _brand()
-    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
-        group = getGitlab().groups.get(namePath)
-        return [_gitlabProjectToRef(p) for p in group.projects.list(get_all=True)]
-    if brand == capDns_seedInfo.GitProviderBrand.Github:
-        gh = getGithub()
-        try:
-            owner = gh.get_organization(namePath)      # try org first
-        except github.GithubException:
-            owner = gh.get_user(namePath)              # fall back to user
-        return [_githubRepoToRef(r) for r in owner.get_repos()]
-    raise NotImplementedError(f"listRepos not implemented for brand {brand}")
-
-
-def getRepo(repoPath: str) -> RepoRef:
-    """ Resolve a single repo by full path -> RepoRef. Brand-dispatched. """
-    brand = _brand()
-    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
-        return _gitlabProjectToRef(getGitlab().projects.get(repoPath))
-    if brand == capDns_seedInfo.GitProviderBrand.Github:
-        return _githubRepoToRef(getGithub().get_repo(repoPath))
-    raise NotImplementedError(f"getRepo not implemented for brand {brand}")
-
-
-def authToken():
-    """ The access token for the current brand (for https-auth clone URLs). """
-    brand = _brand()
-    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
-        return getGitlab().private_token
-    if brand == capDns_seedInfo.GitProviderBrand.Github:
-        return _githubCfg()[1]
-    raise NotImplementedError(f"authToken not implemented for brand {brand}")
-
-
-def _httpsCredPrefix(token) -> str:
-    """ Userinfo to inject into an https clone URL, per brand. """
-    brand = _brand()
-    if brand == capDns_seedInfo.GitProviderBrand.Gitlab:
-        return f"oauth2:{token}@"
-    if brand == capDns_seedInfo.GitProviderBrand.Github:
-        return f"{token}@"
-    raise NotImplementedError(f"_httpsCredPrefix not implemented for brand {brand}")
-
-
-def cloneUrlForRef(ref: RepoRef) -> str:
-    """ Choose the clone URL for a RepoRef per cmndsControlInfo access policy. """
-    ci = capDns_seedInfo.cmndsControlInfo
-    GAT = capDns_seedInfo.GitAccessType
-    GAM = capDns_seedInfo.GitAuthAccessMethod
-
-    if ci.gitAccessType == GAT.Auth:
-        if ci.gitAuthAccessMethod in (GAM.Ssh, GAM.SshOverHttps):
-            if ci.gitAccessAcct:                                # host -> ~/.ssh/config alias
-                pathPart = ref.sshUrl.partition('@')[2].partition(':')[2]
-                return f"git@{ci.gitAccessAcct}:{pathPart}"
-            return ref.sshUrl
-        if ci.gitAuthAccessMethod == GAM.Https:
-            token = authToken()
-            if token and ref.httpUrl.startswith("https://"):
-                return ref.httpUrl.replace("https://", f"https://{_httpsCredPrefix(token)}", 1)
-            return ref.httpUrl
-
-    return ref.httpUrl                                          # anon => public https
-
-
-def cloneRef(ref: RepoRef, baseDir: pathlib.Path) -> dict:
-    """ Clone one repo under baseDir/namespacePath; skip if it already exists. """
-    dest = baseDir / ref.namespacePath
-    if dest.exists():
-        print(f"skipped (exists): {dest}")
-        return {"path": ref.namespacePath, "dest": str(dest), "status": "skipped"}
-
-    url = cloneUrlForRef(ref)
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    print(f"cloning: {ref.namespacePath} -> {dest}")
-    completed = subprocess.run(
-        ["git", "clone", url, str(dest)],
-        capture_output=True, text=True,
-    )
-    if completed.returncode != 0:
-        log.error(f"clone failed for {ref.namespacePath}: {completed.stderr.strip()}")
-        return {"path": ref.namespacePath, "dest": str(dest), "status": "failed"}
-    return {"path": ref.namespacePath, "dest": str(dest), "status": "cloned"}
-
-
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_reposList" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_resolve" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_reposList>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_resolve>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_reposList(cs.Cmnd):
+class capDns_resolve(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -379,7 +273,7 @@ class capDns_reposList(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             argsList: typing.Optional[list[str]]=None,  # CsArgs
+             argsList: typing.Optional[list[str]]=None,
     ) -> b.op.Outcome:
 
         failed = b_io.eh.badOutcome
@@ -389,35 +283,23 @@ class capDns_reposList(cs.Cmnd):
         cmndArgsSpecDict = self.cmndArgsSpec()
 ####+END:
         self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]]
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Resolve =fqdn= (or arg) via =getent ahosts=.
         #+end_org """)
 
-        self.captureRunStr(""" #+begin_org
-*** Run Results
-#+begin_src sh :results output :session shared
-gitlab-pub-capDns.pcs -i capDns_reposList mohsen.byname-group
-  #+end_src
-#+RESULTS:
-: 79388111 mohsen.byname-group/mohsen.byname-project
-: [{'id': 79388111, 'path': 'mohsen.byname-group/mohsen.byname-project'}]
-        #+end_org """)
-
+        ci = capDns_seedInfo.cmndsControlInfo
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
-        if not cmndArgs:
-            log.error("A gitlab group path argument is required.")
-            return failed(cmndOutcome)
-        groupPath = cmndArgs[0]
+        fqdn = cmndArgs[0] if cmndArgs else ci.fqdn
 
-        repos = []
-        for ref in listRepos(groupPath):
-            print(ref.ident, ref.namespacePath)
-            repos.append({"id": ref.ident, "path": ref.namespacePath})
-
-        return cmndOutcome.set(
-            opError=b.OpError.Success,
-            opResults=repos,
+        result = subprocess.run(
+            ['getent', 'hosts', fqdn],
+            capture_output=True, text=True,
         )
+        if result.returncode == 0:
+            b_io.ann.note(f"capDns_resolve: {fqdn} ->\n{result.stdout.strip()}")
+        else:
+            b_io.ann.note(f"capDns_resolve: {fqdn} not found")
 
+        return cmndOutcome.set(opError=b.OpError.Success, opResults=result.stdout.strip())
 
 ####+BEGIN: b:py3:cs:method/args :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList "self"
     """ #+begin_org
@@ -426,28 +308,23 @@ gitlab-pub-capDns.pcs -i capDns_reposList mohsen.byname-group
     @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
     def cmndArgsSpec(self, ):
 ####+END:
-        """
-***** Cmnd Args Specification
-"""
         cmndArgsSpecDict = cs.CmndArgsSpecDict()
-
         cmndArgsSpecDict.argsDictAdd(
             argPosition="0&1",
             argName="cmndArgs",
             argDefault='',
             argChoices=[],
-            argDescription="GroupPath"
+            argDescription="fqdn to resolve (overrides cntrlInfo.fqdn)"
         )
-
         return cmndArgsSpecDict
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_reposClone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_fqdnPing" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_reposClone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_fqdnPing>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_reposClone(cs.Cmnd):
-    cmndParamsMandatory = [ 'destBaseDir', ]
+class capDns_fqdnPing(cs.Cmnd):
+    cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
 
@@ -455,43 +332,32 @@ class capDns_reposClone(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             destBaseDir: typing.Optional[str]=None,  # Cs Mandatory Param
-             argsList: typing.Optional[list[str]]=None,  # CsArgs
+             argsList: typing.Optional[list[str]]=None,
     ) -> b.op.Outcome:
 
         failed = b_io.eh.badOutcome
-        callParamsDict = {'destBaseDir': destBaseDir, }
+        callParamsDict = {}
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, argsList).isProblematic():
             return failed(cmndOutcome)
         cmndArgsSpecDict = self.cmndArgsSpec()
 ####+END:
         self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Clone every repo of a gitlab group under destBaseDir (mirroring path_with_namespace; skip if exists).
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Ping =fqdn= (or the fqdn passed as arg) once.
         #+end_org """)
 
-        self.captureRunStr(""" #+begin_org
-*** Run Results
-#+begin_src sh :results output :session shared
-gitlab-pub-capDns.pcs -i capDns_reposClone --destBaseDir=/tmp/capDnsTest mohsen.byname-group
-  #+end_src
-#+RESULTS:
-: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project
-: [{'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}]
-        #+end_org """)
-
+        ci = capDns_seedInfo.cmndsControlInfo
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
-        if not cmndArgs:
-            log.error("A gitlab group path argument is required.")
-            return failed(cmndOutcome)
-        groupPath = cmndArgs[0]
+        fqdn = cmndArgs[0] if cmndArgs else ci.fqdn
 
-        baseDir = pathlib.Path(destBaseDir).expanduser()
-
-        results = [cloneRef(ref, baseDir) for ref in listRepos(groupPath)]
+        result = subprocess.run(
+            ['ping', '-c', '1', fqdn],
+            capture_output=True, text=True,
+        )
+        b_io.ann.note(result.stdout.strip() if result.returncode == 0 else f"ping failed: {fqdn}")
 
         return cmndOutcome.set(
-            opError=b.OpError.Success,
-            opResults=results,
+            opError=b.OpError.Success if result.returncode == 0 else b.OpError.Failed,
+            opResults=result.stdout.strip(),
         )
 
 ####+BEGIN: b:py3:cs:method/args :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList "self"
@@ -511,81 +377,7 @@ gitlab-pub-capDns.pcs -i capDns_reposClone --destBaseDir=/tmp/capDnsTest mohsen.
             argName="cmndArgs",
             argDefault='',
             argChoices=[],
-            argDescription="GroupPath"
-        )
-
-        return cmndArgsSpecDict
-
-
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_clone" :comment "" :extent "verify" :ro "cli" :parsMand "destBaseDir" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
-""" #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_clone>>  =verify= parsMand=destBaseDir argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
-#+end_org """
-class capDns_clone(cs.Cmnd):
-    cmndParamsMandatory = [ 'destBaseDir', ]
-    cmndParamsOptional = [ ]
-    cmndArgsLen = {'Min': 0, 'Max': 1,}
-
-    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-             rtInv: cs.RtInvoker,
-             cmndOutcome: b.op.Outcome,
-             destBaseDir: typing.Optional[str]=None,  # Cs Mandatory Param
-             argsList: typing.Optional[list[str]]=None,  # CsArgs
-    ) -> b.op.Outcome:
-
-        failed = b_io.eh.badOutcome
-        callParamsDict = {'destBaseDir': destBaseDir, }
-        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, argsList).isProblematic():
-            return failed(cmndOutcome)
-        cmndArgsSpecDict = self.cmndArgsSpec()
-####+END:
-        self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Clone a single gitlab project (by full path) under destBaseDir (mirroring path_with_namespace; skip if exists).
-        #+end_org """)
-
-        self.captureRunStr(""" #+begin_org
-*** Run Results
-#+begin_src sh :results output :session shared
-gitlab-pub-capDns.pcs -i capDns_clone --destBaseDir=/tmp/capDnsTest mohsen.byname-group/mohsen.byname-project
-  #+end_src
-#+RESULTS:
-: cloning: mohsen.byname-group/mohsen.byname-project -> /tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project
-: {'path': 'mohsen.byname-group/mohsen.byname-project', 'dest': '/tmp/capDnsTest/mohsen.byname-group/mohsen.byname-project', 'status': 'cloned'}
-        #+end_org """)
-
-        cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
-        if not cmndArgs:
-            log.error("A gitlab project path argument is required.")
-            return failed(cmndOutcome)
-        projectPath = cmndArgs[0]
-
-        baseDir = pathlib.Path(destBaseDir).expanduser()
-        result = cloneRef(getRepo(projectPath), baseDir)
-
-        return cmndOutcome.set(
-            opError=b.OpError.Success,
-            opResults=result,
-        )
-
-####+BEGIN: b:py3:cs:method/args :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList "self"
-    """ #+begin_org
-**  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Mtd-T-anyOrNone [[elisp:(outline-show-subtree+toggle)][||]] /cmndArgsSpec/ deco=default  deco=default  [[elisp:(org-cycle)][| ]]
-    #+end_org """
-    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmndArgsSpec(self, ):
-####+END:
-        """
-***** Cmnd Args Specification
-"""
-        cmndArgsSpecDict = cs.CmndArgsSpecDict()
-
-        cmndArgsSpecDict.argsDictAdd(
-            argPosition="0&1",
-            argName="cmndArgs",
-            argDefault='',
-            argChoices=[],
-            argDescription="ProjectPath"
+            argDescription="fqdn to ping (overrides cntrlInfo.fqdn)"
         )
 
         return cmndArgsSpecDict

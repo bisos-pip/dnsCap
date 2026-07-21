@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """ #+begin_org
-* ~[Summary]~ :: A =PlantedCmndService= example for capDns -- here processing
+* ~[Summary]~ :: A =PlantedCmndService= for Processing BISOS-Capability 
 #+end_org """
 
 from bisos.b import cs
@@ -14,8 +14,8 @@ from bisos.capDns import capDns_seed #  noqa: F401  # type: ignore[unused-import
 from bisos.capDns import capDns_seedInfo
 cntrlInfo = capDns_seedInfo.cmndsControlInfo
 
-cntrlInfo.dnsSpecMethod = capDns_seedInfo.DnsSpecMethod.etcHosts
-cntrlInfo.fqdn = "exmpl.here"
+cntrlInfo.dnsSpecMethod = capDns_seedInfo.DnsSpecMethod.etcHosts   # Other choice is tinydns
+cntrlInfo.fqdn = "airflow.here"
 
 from bisos.csSeed import csCmndsList_seedInfo
 csCmnd = csCmndsList_seedInfo.csCmnd

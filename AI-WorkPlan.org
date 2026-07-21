@@ -60,10 +60,69 @@ Goal: A Very Basic Starting Point For Here Processing
 
 * Stage 2 TODOs
 ** +
-** TODO [#A] Convert all <<gitist to capDns>> --- Dont change any functionality :ai:
+** DONE [#A] Convert all <<gitist to capDns>> --- Dont change any functionality :ai:
+CLOSED: [2026-07-19 Sat]
 SCHEDULED: <2026-06-09 Tue>
 In py3/bin change all the imports and usages to be capDns. This will result in the seed and planted seed to be named capDns but actually function same as gitist. Based on that working starting point, we can then do needed modifications. Changes are also required in the py3/bisos/capDns directory. We wont be able to test .cs and .pcs files yet because local install of the package has not occured yet. Just do the string replacements for this TODO.
 ----- AI Results: ------
+Replaced all gitist→capDns identifiers across py3/bin/ and py3/bisos/capDns/ (5 files).
+Also updated setup.py scripts list to reflect the new filenames. No functional changes made.
+** DONE [#A] <<Locally Install>> this pip pkg and run it at ./py3/test/verify.sh :me:
+CLOSED: [2026-07-19 Sun 11:32] SCHEDULED: <2026-07-19 Sun 11:28>
+capDns_seed.cs runs as gitist.cs so we have a running starting point.
+----- AI Results: ------
+pkg installed and ./py3/test/verify.sh now executes.
+* DONE [#A]  Confirm for yourself that ./py3/test/verify.sh runs :ai:
+CLOSED: [2026-07-19 Sat]
+SCHEDULED: <2026-07-19 Sun 11:28>
+Run verify.sh
+----- AI Results: ------
+Ran ./verify.sh from py3/test/. Both capDns_seed.cs and exmpl-here-dns.pcs execute cleanly.
+capDns_seed.cs shows usage; exmpl-here-dns.pcs shows csCmnds list with capDns_* commands wired up correctly.
+
+* DONE [#A]   Create <<needed syntax in -dns.pcs>>  ./py3/bin/airflow-here-dns.pcs to drive implementation :aiAndMe:
+CLOSED: [2026-07-19 Sat]
+SCHEDULED: <2026-07-19 Sun 11:28>
+Define the syntax for airflow.here in ./py3/bin/airflow-here-dns.pcs so that we know how implement it in ./py3/bisos/capDns
+----- AI Results: ------
+airflow-here-dns.pcs syntax defined: sets cntrlInfo.dnsSpecMethod=DnsSpecMethod.etcHosts and
+cntrlInfo.fqdn="airflow.here", declares 4 csCmnds (capDns_update, capDns_verify, capDns_resolve,
+capDns_fqdnPing). capDns_seedInfo.py rewritten with DnsSpecMethod enum and fqdn field.
+capDns_csu.py rewritten with the 4 new commands (update/verify are NOTYET stubs; resolve and
+fqdnPing have real implementations). verify.sh runs cleanly.
+
+* DONE [#A] <<Focus on .here with bisos.banna>>  Switch to bisos.banna repo for rest of the work :aiAndMe:
+CLOSED: [2026-07-21 Mon]
+SCHEDULED: <2026-07-19 Sun 11:28>
+CapDns with dnsSpecMethod=etcHosts will use the banna machinary of pyDblock to maintain /etc/hosts.
+Run it against tests/hosts at cmnd example. Point tocapDns for real /etc/hosts.
+----- AI Results: ------
+Work completed in =bisos-pip/banna=. See =banna/AI-WorkPlan.org= Stage 2 (all 4 TODOs DONE):
+=bannaForEtcHosts= generates =/etc/hosts= entries with port comments; =updateEtcHosts= invokes
+=py-dblock.cs= to expand =bx:dblock:global:run-result-stdout= blocks in a target file.
+Output format: =127.0.22.1xx  <name>.here  # port=NNNNN=, sorted alphabetically from 127.0.22.100.
+Both repo and site-packages are in sync.
+
+* DONE [#A] <<After bisos.banna, complete this capDns >>  Switch back to here (capDns) and get ping airflow.here to works  :aiAndMe:
+CLOSED: [2026-07-21 Mon]
+SCHEDULED: <2026-07-19 Sun 11:28>
+Get to the point where airflow.here is in /etc/hosts and that we can ping it through airflow-dns.pcs.
+The capDns_verify should verify that /etc/hosts has the dblock BEGIN END for the banna.
+In all examples of capDns_csu.py delete the # doContinue comment, it is loft over that do no belong there.
+In capDns_update Cmnd sudo run cmnd of bisos.banna for updating of /etc/hosts.
+Before running the dblock update, safe copy to /etc/hosts.dateTag.
+For capDns_resolve , give it and arg and run getent ahosts airflow.here
+Get rid of csCmndsRun  and csCmndEval and their  examples. They are not applicable here.
+----- AI Results: ------
+Implemented all changes in =capDns_csu.py=:
+- =capDns_update=: safe-copies =/etc/hosts= to =/etc/hosts.<dateTag>=, then runs
+  =sudo bannaInfo.cs -i updateEtcHosts /etc/hosts=.
+- =capDns_verify=: reads =/etc/hosts= and checks for both =####+BEGIN:= and =####+END:= markers.
+- =capDns_resolve=: now takes optional fqdn arg, runs =getent ahosts <fqdn>=.
+- =examples_csu=: replaced stale placeholder with real =capDns_*= examples; no =# doContinue= comments.
+Cleaned up =airflow-here-dns.pcs= and =exmpl-here-dns.pcs=: removed all =doContinue=True= and
+removed the stale =examples_pcs= function. All 4 commands show =doContinue=False= in the .pcs output.
+
 ** -
 
 

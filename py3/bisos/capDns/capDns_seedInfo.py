@@ -73,18 +73,10 @@ Module description comes here.
 """ #+begin_org
 *  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] *Imports* =Based on Classification=cs-u=
 #+end_org """
-from bisos import b  # noqa: E402
 from bisos.b import cs
-from bisos.b import b_io
-from bisos.common import csParam
-
-import collections
-# ####+END:
-
+import typing
 import enum
 from dataclasses import dataclass
-
-# from bisos.csSeed import cmnds_seedInfo
 
 ####+BEGIN: bx:cs:py3:section :title "Public Classes"
 """ #+begin_org
@@ -92,28 +84,15 @@ from dataclasses import dataclass
 #+end_org """
 ####+END:
 
-####+BEGIN: bx:dblock:python:enum :enumName " GitProviderBrand" :comment ""
+####+BEGIN: bx:dblock:python:enum :enumName "DnsSpecMethod" :comment ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Enum       [[elisp:(outline-show-subtree+toggle)][||]] / GitProviderBrand/  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Enum       [[elisp:(outline-show-subtree+toggle)][||]] /DnsSpecMethod/  [[elisp:(org-cycle)][| ]]
 #+end_org """
 @enum.unique
-class  GitProviderBrand(enum.Enum):
+class DnsSpecMethod(enum.Enum):
 ####+END:
-        Gitlab = "gitlab"
-        Github = "github"
-
-
-@enum.unique
-class GitAccessType(enum.Enum):
-    Anon = "anon"
-    Auth = "auth"
-
-
-@enum.unique
-class GitAuthAccessMethod(enum.Enum):
-    Ssh = "ssh"
-    Https = "https"
-    SshOverHttps = "sshOverHttps"
+    etcHosts = "etcHosts"
+    tinydns  = "tinydns"
 
 
 ####+BEGIN: b:py3:class/decl :className "CmndsControlInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"
@@ -124,19 +103,11 @@ class GitAuthAccessMethod(enum.Enum):
 class CmndsControlInfo(object):
 ####+END:
     """
-** Abstraction of
+** Abstraction of DNS capability control parameters.
 """
 
-    brand: GitProviderBrand | None = None
-
-    # gitlab: python-gitlab `Gitlab.from_config(serverConfigTag, [serverConfigPath])`
-    serverConfigPath: str | None = None
-    serverConfigTag: str | None = None
-
-    # clone access policy (consulted by reposClone for clone-URL selection)
-    gitAccessType: GitAccessType | None = None              # anon => public https; auth => use gitAuthAccessMethod
-    gitAuthAccessMethod: GitAuthAccessMethod | None = None   # ssh / https / sshOverHttps (only when Auth)
-    gitAccessAcct: str | None = None                         # ~/.ssh/config Host alias (ssh / sshOverHttps)
+    dnsSpecMethod: DnsSpecMethod | None = None
+    fqdn: str | None = None
 
 ####+BEGIN: b:py3:class/singleton  :comment ""
     """ #+begin_org
@@ -167,11 +138,7 @@ class CapDnsSeedInfo(object):
     seedType: str | None = None  # post_init: self.__class__.__name__
     examplesFuncsList: list[typing.Callable] | None = None
 
-    # Specific SeedInfo
-    placeHolder: str | None = None
-
     def __post_init__(self):
-        # default_factory machinery does not have access to self, hence in post_init:
         if self.seedType is None:
             self.seedType = self.__class__.__name__
 
@@ -202,18 +169,13 @@ capDnsSeedInfo = CapDnsSeedInfo()
 @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
 def setup(
 ####+END:
-        examplesFuncsList: list[typing.Callable] | None =None,
-        placeHolder: str | None = None,
+        examplesFuncsList: list[typing.Callable] | None = None,
 ):
     """ #+begin_org
 ** [[elisp:(org-cycle)][| *DocStr | ]
     #+end_org """
     if examplesFuncsList is not None:
-        capDnsSeedInfo.examplesFuncsList  = examplesFuncsList
-        cmnds_seedInfo.setup(
-            examplesFuncsList=examplesFuncsList,
-        )
-    capDnsSeedInfo.placeHolder = placeHolder
+        capDnsSeedInfo.examplesFuncsList = examplesFuncsList
 
 
 ####+BEGIN: b:py3:cs:framework/endOfFile :basedOn "classification"
