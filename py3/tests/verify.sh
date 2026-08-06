@@ -8,12 +8,12 @@ if [[ "$(basename "$PWD")" != "tests" ]]; then
     exit 1
 fi
 
-lpDo ../bin/capDns_seed.cs
+lpDo ../bin/dnsCap_seed.cs
 lpDo ../bin/airflow-here-dns.pcs
-lpDo ../bin/airflow-here-dns.pcs -i capDns_verify
-lpDo ../bin/airflow-here-dns.pcs -i capDns_update
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_verify
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_update
 lpDo cat /etc/hosts
-lpDo ../bin/airflow-here-dns.pcs -i capDns_resolve  airflow.here
-lpDo ../bin/airflow-here-dns.pcs -i capDns_fqdnPing  airflow.here
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_resolve  airflow.here
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_fqdnPing  airflow.here
 lpDo ping -c 3 airflow.here
 

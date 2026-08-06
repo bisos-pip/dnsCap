@@ -123,6 +123,36 @@ Implemented all changes in =capDns_csu.py=:
 Cleaned up =airflow-here-dns.pcs= and =exmpl-here-dns.pcs=: removed all =doContinue=True= and
 removed the stale =examples_pcs= function. All 4 commands show =doContinue=False= in the .pcs output.
 
+* DONE [#A] <<Rename capDns to dnsCap >> :aiAndMe:
+CLOSED: [2026-08-05 Wed]
+SCHEDULED: <2026-08-05 Wed 16:52>
+I have renamed the repo from capDns to dnsCap.
+We need to do the same for the entire package.
+The seed needs to be seed_dnsCap, py3/bisos/capDns becomes py3/bisos/dnsCap
+And all the code needs to be modified to refect that.
+----- AI Results: ------
+Renamed the entire package =capDns= -> =dnsCap= (seed filename kept the existing
+=<pkg>_seed.cs= word order per your choice: =dnsCap_seed.cs=, not =seed_dnsCap.cs=).
+
+Files renamed via =git mv=:
+- =py3/bisos/capDns/= -> =py3/bisos/dnsCap/=
+- =capDns_csu.py= / =capDns_seedInfo.py= / =capDns_seed.py= -> =dnsCap_*.py=
+- =py3/bin/capDns_seed.cs= -> =py3/bin/dnsCap_seed.cs=
+- =py3/panels/bisos.capDns/= -> =py3/panels/bisos.dnsCap/=
+
+Content updated (=capDns=->=dnsCap=, =CapDns=->=DnsCap=) across =dnsCap_csu.py=,
+=dnsCap_seedInfo.py=, =dnsCap_seed.py=, =dnsCap_seed.cs=, =setup.py= (scripts entry +
+=# 'bisos.dnsCap'= comment), =airflow-here-dns.pcs=, =exmpl-here-dns.pcs=, =verify.sh=.
+No =capDns=/=CapDns= tokens remain in =py3=. =setup.py='s =pkgName()= auto-derives
+=bisos.dnsCap= from the (already-renamed) repo dir, so =name== needed no change.
+
+Verified: developer did the local editable install in dev-bisos3 venv; Claude re-ran
+=py3/tests/verify.sh= end-to-end — =dnsCap_seed.cs= loads, =airflow-here-dns.pcs= lists
+4 =dnsCap_*= csCmnds, =dnsCap_verify= confirms the banna dblock markers, =dnsCap_update=
+backs up and rewrites =/etc/hosts=, =dnsCap_resolve airflow.here= -> 127.0.22.100, and
+both =dnsCap_fqdnPing= and =ping -c 3 airflow.here= succeed with 0% packet loss.
+
+
 ** -
 
 

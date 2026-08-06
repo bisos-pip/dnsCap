@@ -43,7 +43,7 @@ def longDescription():
 # b:py3:pypi:setup/version Arguments  :forSys t :forPyPi t :constant "666"
 ####+BEGIN: b:py3:pypi:setup/version :comment "Auto Detected"
 
-# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.1 -- forLocalVersion=0.1 -- constant=NA
+# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.12 -- forLocalVersion=0.1 -- constant=NA
 def pkgVersion():
         return '0.1'
 
@@ -68,7 +68,7 @@ requires = [
 
 scripts = [
 'bin/airflow-here-dns.pcs',
-'bin/capDns_seed.cs',
+'bin/dnsCap_seed.cs',
 'bin/exmpl-here-dns.pcs',
 ]
 ####+END:
@@ -82,10 +82,10 @@ data_files = [
 ####+END:
 
 # :pkgName "--auto--"  --- results in use of name=pkgName(),
-####+BEGINNOT: b:py3:pypi:setup/funcArgs :comment "defaults to --auto--"
+####+BEGIN: b:py3:pypi:setup/funcArgs :comment "defaults to --auto--"
 
 setuptools.setup(
-    name=pkgName(),  # 'bisos.capDns'
+    name=pkgName(),  # 'bisos.dnsCap'
     version=pkgVersion(),
     packages=setuptools.find_packages(),
     scripts=scripts,
@@ -103,6 +103,7 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries',

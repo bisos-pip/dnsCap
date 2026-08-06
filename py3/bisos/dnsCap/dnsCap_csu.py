@@ -28,8 +28,8 @@
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_csu.py
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_csu.py
+** This File: /bisos/git/bxRepos/bisos-pip/dnsCap/py3/bisos/dnsCap/dnsCap_csu.py
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/dnsCap/py3/bisos/dnsCap/dnsCap_csu.py
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -41,7 +41,7 @@
 if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
 csInfo['version'] = '202606053019'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'capDns_csu-Panel.org'
+csInfo['panel'] = 'dnsCap_csu-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -93,7 +93,7 @@ from bisos.common import csParam
 import collections
 ####+END:
 
-from bisos.capDns import capDns_seedInfo
+from bisos.dnsCap import dnsCap_seedInfo
 
 import logging
 log = logging.getLogger(__name__)
@@ -139,7 +139,7 @@ def examples_csu(
         sectionTitle: typing.AnyStr = '',
 ) -> None:
     """ #+begin_org
-** [[elisp:(org-cycle)][| *DocStr* |]] Examples of capDns commands.
+** [[elisp:(org-cycle)][| *DocStr* |]] Examples of dnsCap commands.
     #+end_org """
 
     cmnd = cs.examples.cmndEnter
@@ -148,18 +148,18 @@ def examples_csu(
         cs.examples.menuChapter('*BISOS DNS Capability Commands*')
 
     cs.examples.menuSection('/DNS Capability Commands/')
-    cmnd('capDns_update',   comment="# Update /etc/hosts dblock (sudo)")
-    cmnd('capDns_verify',   comment="# Verify /etc/hosts has the banna dblock")
-    cmnd('capDns_resolve',  comment="# Resolve fqdn via getent hosts")
-    cmnd('capDns_fqdnPing', comment="# Ping fqdn once")
-    cmnd('capDns_fqdnPing', comment="ping airflow.here  # Direct ping to verify /etc/hosts entry")
+    cmnd('dnsCap_update',   comment="# Update /etc/hosts dblock (sudo)")
+    cmnd('dnsCap_verify',   comment="# Verify /etc/hosts has the banna dblock")
+    cmnd('dnsCap_resolve',  comment="# Resolve fqdn via getent hosts")
+    cmnd('dnsCap_fqdnPing', comment="# Ping fqdn once")
+    cmnd('dnsCap_fqdnPing', comment="ping airflow.here  # Direct ping to verify /etc/hosts entry")
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_update" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_update" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_update>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_update>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_update(cs.Cmnd):
+class dnsCap_update(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
@@ -183,7 +183,7 @@ class capDns_update(cs.Cmnd):
         import datetime
         import shutil
 
-        ci = capDns_seedInfo.cmndsControlInfo
+        ci = dnsCap_seedInfo.cmndsControlInfo
         hostsFile = pathlib.Path('/etc/hosts')
 
         dateTag = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -219,11 +219,11 @@ class capDns_update(cs.Cmnd):
         return cmndOutcome.set(opError=b.OpError.Success)
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_verify" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_verify" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_verify>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_verify>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_verify(cs.Cmnd):
+class dnsCap_verify(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
@@ -248,7 +248,7 @@ class capDns_verify(cs.Cmnd):
         hasEnd = '####+END:' in hostsContent
 
         if hasBegin and hasEnd:
-            b_io.ann.note("capDns_verify: /etc/hosts has banna dblock (BEGIN and END markers present)")
+            b_io.ann.note("dnsCap_verify: /etc/hosts has banna dblock (BEGIN and END markers present)")
             return cmndOutcome.set(opError=b.OpError.Success)
         else:
             missing = []
@@ -256,15 +256,15 @@ class capDns_verify(cs.Cmnd):
                 missing.append('####+BEGIN:')
             if not hasEnd:
                 missing.append('####+END:')
-            b_io.ann.note(f"capDns_verify: FAIL -- /etc/hosts missing: {', '.join(missing)}")
+            b_io.ann.note(f"dnsCap_verify: FAIL -- /etc/hosts missing: {', '.join(missing)}")
             return failed(cmndOutcome)
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_resolve" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_resolve" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_resolve>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_resolve>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_resolve(cs.Cmnd):
+class dnsCap_resolve(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -286,7 +286,7 @@ class capDns_resolve(cs.Cmnd):
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Resolve =fqdn= (or arg) via =getent ahosts=.
         #+end_org """)
 
-        ci = capDns_seedInfo.cmndsControlInfo
+        ci = dnsCap_seedInfo.cmndsControlInfo
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
         fqdn = cmndArgs[0] if cmndArgs else ci.fqdn
 
@@ -295,9 +295,9 @@ class capDns_resolve(cs.Cmnd):
             capture_output=True, text=True,
         )
         if result.returncode == 0:
-            b_io.ann.note(f"capDns_resolve: {fqdn} ->\n{result.stdout.strip()}")
+            b_io.ann.note(f"dnsCap_resolve: {fqdn} ->\n{result.stdout.strip()}")
         else:
-            b_io.ann.note(f"capDns_resolve: {fqdn} not found")
+            b_io.ann.note(f"dnsCap_resolve: {fqdn} not found")
 
         return cmndOutcome.set(opError=b.OpError.Success, opResults=result.stdout.strip())
 
@@ -319,11 +319,11 @@ class capDns_resolve(cs.Cmnd):
         return cmndArgsSpecDict
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "capDns_fqdnPing" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_fqdnPing" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<capDns_fqdnPing>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_fqdnPing>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
-class capDns_fqdnPing(cs.Cmnd):
+class dnsCap_fqdnPing(cs.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 1,}
@@ -345,7 +345,7 @@ class capDns_fqdnPing(cs.Cmnd):
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]] Ping =fqdn= (or the fqdn passed as arg) once.
         #+end_org """)
 
-        ci = capDns_seedInfo.cmndsControlInfo
+        ci = dnsCap_seedInfo.cmndsControlInfo
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
         fqdn = cmndArgs[0] if cmndArgs else ci.fqdn
 

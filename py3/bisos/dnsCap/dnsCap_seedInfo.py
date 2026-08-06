@@ -28,8 +28,8 @@
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seedInfo.py
-** File True Name: /bisos/git/auth/bxRepos/bisos-pip/capDns/py3/bisos/capDns/capDns_seedInfo.py
+** This File: /bisos/git/bxRepos/bisos-pip/dnsCap/py3/bisos/dnsCap/dnsCap_seedInfo.py
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/dnsCap/py3/bisos/dnsCap/dnsCap_seedInfo.py
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -41,7 +41,7 @@
 if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
 csInfo['version'] = '202606051605'
 csInfo['status']  = 'inUse'
-csInfo['panel'] = 'capDns_seedInfo-Panel.org'
+csInfo['panel'] = 'dnsCap_seedInfo-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
 csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 ####+END:
@@ -124,12 +124,12 @@ class CmndsControlInfo(object):
 cmndsControlInfo = CmndsControlInfo()
 
 
-####+BEGIN: b:py3:class/decl :className "CapDnsSeedInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"
+####+BEGIN: b:py3:class/decl :className "DnsCapSeedInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Cls-basic  [[elisp:(outline-show-subtree+toggle)][||]] /CapDnsSeedInfo/  superClass=object =Abstraction of a  Interface=  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Cls-basic  [[elisp:(outline-show-subtree+toggle)][||]] /DnsCapSeedInfo/  superClass=object =Abstraction of a  Interface=  [[elisp:(org-cycle)][| ]]
 #+end_org """
 @dataclass
-class CapDnsSeedInfo(object):
+class DnsCapSeedInfo(object):
 ####+END:
     """
 ** Abstraction of
@@ -154,7 +154,7 @@ class CapDnsSeedInfo(object):
 ####+END:
 
 # Singleton Instantiation
-capDnsSeedInfo = CapDnsSeedInfo()
+dnsCapSeedInfo = DnsCapSeedInfo()
 
 ####+BEGIN: bx:cs:py3:section :title "Public Functions"
 """ #+begin_org
@@ -175,7 +175,7 @@ def setup(
 ** [[elisp:(org-cycle)][| *DocStr | ]
     #+end_org """
     if examplesFuncsList is not None:
-        capDnsSeedInfo.examplesFuncsList = examplesFuncsList
+        dnsCapSeedInfo.examplesFuncsList = examplesFuncsList
 
 
 ####+BEGIN: b:py3:cs:framework/endOfFile :basedOn "classification"

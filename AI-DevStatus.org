@@ -9,8 +9,8 @@
 
 ####+BEGIN: b:ai:file/particulars
 * AI Working Context
-  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/capDns
-  File: /bisos/git/auth/bxRepos/bisos-pip/capDns/AI-DevStatus.org
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/dnsCap
+  File: /bisos/git/auth/bxRepos/bisos-pip/dnsCap/AI-DevStatus.org
   Activity: bisos-pip
   Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org, README.org
 ###+END:
@@ -27,54 +27,71 @@ Fill in the sections below when asked to update, following the structure provide
 
 * Current State
 
+  Package renamed =capDns= -> =dnsCap= (2026-08-05, Stage 2 last TODO). The repo dir,
+  the =py3/bisos/dnsCap/= package, its three modules (=dnsCap_csu.py=,
+  =dnsCap_seedInfo.py=, =dnsCap_seed.py=), the seed =py3/bin/dnsCap_seed.cs=, the
+  =py3/panels/bisos.dnsCap/= panels dir, and all identifiers/imports/command names
+  were switched from =capDns=/=CapDns= to =dnsCap=/=DnsCap=. =setup.py='s =pkgName()=
+  auto-derives =bisos.dnsCap= from the repo dir name. Developer did the editable
+  install in dev-bisos3; =verify.sh= re-run confirms the rename is fully functional.
+
+  =README.org= rewritten (2026-08-05): was a leftover copy of the =bisos.gitist=
+  README. Now titled "DNS Management Facilities for BISOS Capabilities" and framed
+  correctly — =dnsCap= is *not* itself a BISOS Capability but the DNS *aspect* /
+  ingredient of a CBS (Capability Bundle Specification) realized by
+  =bisos.capability=, alongside sibling aspects =webCap= and =sbom=. Includes the
+  concrete =airflow.here= =/etc/hosts= example and a command table. =py3/README.rst=
+  is left stale on purpose — it regenerates from =README.org= via
+  =pypiProc.sh -i fullPrep= at release time.
+
   Stage 2 is fully complete. All TODOs are DONE. =verify.sh= passes end-to-end:
-  =capDns_update= rewrites =/etc/hosts= via the banna dblock machinery, =capDns_verify=
-  confirms the dblock markers are present, =capDns_resolve= resolves =airflow.here= to
-  =127.0.22.100=, and =capDns_fqdnPing= / =ping -c 3 airflow.here= both succeed with
+  =dnsCap_update= rewrites =/etc/hosts= via the banna dblock machinery, =dnsCap_verify=
+  confirms the dblock markers are present, =dnsCap_resolve= resolves =airflow.here= to
+  =127.0.22.100=, and =dnsCap_fqdnPing= / =ping -c 3 airflow.here= both succeed with
   0% packet loss.
 
   Key implementation completed (2026-07-21):
-  - =capDns_update= and =capDns_verify= fully implemented (were NOTYET stubs).
+  - =dnsCap_update= and =dnsCap_verify= fully implemented (were NOTYET stubs).
   - All =doContinue= remnants removed from =.pcs= files.
-  - =capDns_resolve= changed to accept optional fqdn arg, uses =getent hosts=.
+  - =dnsCap_resolve= changed to accept optional fqdn arg, uses =getent hosts=.
   - =examples_csu= converted from =cs.Cmnd= class to =@cs.track def= function (matches
     banna pattern; avoids framework =perfName= error).
-  - =verify.sh= extended with =capDns_resolve=, =capDns_fqdnPing=, and =ping -c 3=.
+  - =verify.sh= extended with =dnsCap_resolve=, =dnsCap_fqdnPing=, and =ping -c 3=.
   - =iputils-ping= installed in container (required dpkg post-install script removal
     to work around missing systemd bus in container environment).
 
 * Architecture
 
-  - =py3/bisos/capDns/capDns_seedInfo.py= — =DnsSpecMethod= enum (=etcHosts=, =tinydns=)
+  - =py3/bisos/dnsCap/dnsCap_seedInfo.py= — =DnsSpecMethod= enum (=etcHosts=, =tinydns=)
     and =CmndsControlInfo= dataclass with =fqdn= and =dnsSpecMethod= fields.
-  - =py3/bisos/capDns/capDns_csu.py= — CS-Lib with four commands:
-    =capDns_update=, =capDns_verify=, =capDns_resolve=, =capDns_fqdnPing=.
-  - =py3/bisos/capDns/capDns_seedsLib.py= — seeds library (standard bisos-pip pattern).
-  - =py3/bin/capDns_seed.cs= — entry point seeded .cs file.
+  - =py3/bisos/dnsCap/dnsCap_csu.py= — CS-Lib with four commands:
+    =dnsCap_update=, =dnsCap_verify=, =dnsCap_resolve=, =dnsCap_fqdnPing=.
+  - =py3/bisos/dnsCap/dnsCap_seed.py= — seed library (standard bisos-pip pattern).
+  - =py3/bin/dnsCap_seed.cs= — entry point seeded .cs file.
   - =py3/bin/exmpl-here-dns.pcs= — example .pcs for =exmpl.here=.
   - =py3/bin/airflow-here-dns.pcs= — .pcs for =airflow.here= (the primary test target).
   - =py3/tests/verify.sh= — runs seed, .pcs, all four commands, and =ping -c 3=.
 
-  Package is locally pip-installed (editable). Changes to =py3/bisos/capDns/= take
+  Package is locally pip-installed (editable). Changes to =py3/bisos/dnsCap/= take
   effect immediately.
 
 * What Works
 
-  - =capDns_seed.cs= — loads, shows usage and examples.
+  - =dnsCap_seed.cs= — loads, shows usage and examples.
   - =exmpl-here-dns.pcs= and =airflow-here-dns.pcs= — parse correctly, list 4 csCmnds.
-  - =capDns_update= — safe-copies =/etc/hosts= to =/etc/hosts.<dateTag>=, then runs
+  - =dnsCap_update= — safe-copies =/etc/hosts= to =/etc/hosts.<dateTag>=, then runs
     =sudo -E PATH=... <python> <py-dblock.cs> -i updateDblocks /etc/hosts=, expanding
     the =bx:dblock:global:run-result-stdout= block that calls =bannaInfo.cs -i bannaForEtcHosts=.
-  - =capDns_verify= — reads =/etc/hosts= and confirms both =####+BEGIN:= and =####+END:=
+  - =dnsCap_verify= — reads =/etc/hosts= and confirms both =####+BEGIN:= and =####+END:=
     markers are present.
-  - =capDns_resolve= — accepts optional fqdn arg, calls =getent hosts <fqdn>=.
-  - =capDns_fqdnPing= — calls =ping -c 1 <fqdn>=, 0% packet loss verified.
+  - =dnsCap_resolve= — accepts optional fqdn arg, calls =getent hosts <fqdn>=.
+  - =dnsCap_fqdnPing= — calls =ping -c 1 <fqdn>=, 0% packet loss verified.
   - =verify.sh= — full end-to-end pass including =ping -c 3 airflow.here=.
 
 * What Is Untested
 
-  - =capDns_update= on a fresh =/etc/hosts= without pre-existing dblock markers
-    (=capDns_verify= would need to handle that case).
+  - =dnsCap_update= on a fresh =/etc/hosts= without pre-existing dblock markers
+    (=dnsCap_verify= would need to handle that case).
   - =tinydns= backend (=DnsSpecMethod.tinydns= is a placeholder; only =etcHosts= is implemented).
   - PyPI upload and =pipx install= end-to-end.
 
@@ -82,7 +99,7 @@ Fill in the sections below when asked to update, following the structure provide
 
   - =DnsSpecMethod= enum gates which backend manages =/etc/hosts= entries; currently
     only =etcHosts= is pursued. =tinydns= is a placeholder for later.
-  - =capDns_update= calls =sudo -E PATH=<user-PATH> <python> <py-dblock.cs>= directly
+  - =dnsCap_update= calls =sudo -E PATH=<user-PATH> <python> <py-dblock.cs>= directly
     rather than going through =bannaInfo.cs -i updateEtcHosts=. This is necessary
     because =sudo= strips PATH, so both =py-dblock.cs= and the commands it shells out
     to (e.g. =bannaInfo.cs=) must be reachable. =sudo -E= with an explicit =PATH==
@@ -91,9 +108,9 @@ Fill in the sections below when asked to update, following the structure provide
     before passing it to =sudo=, since =sudo= won't find scripts in the venv bin dir
     by name alone.
   - The =.pcs= file sets both =fqdn= and =dnsSpecMethod= on =cntrlInfo= before
-    declaring the =csCmndsList= — this is the standard capDns usage pattern.
+    declaring the =csCmndsList= — this is the standard dnsCap usage pattern.
   - =examples_csu= must be a plain =@cs.track def= function (not a =cs.Cmnd= class)
-    to avoid a framework =perfName= AttributeError when invoked via =capDns_seed.cs -i examples_csu=.
+    to avoid a framework =perfName= AttributeError when invoked via =dnsCap_seed.cs -i examples_csu=.
 
 # Local Variables:
 # eval: (setq-local toc-org-max-depth 4)
