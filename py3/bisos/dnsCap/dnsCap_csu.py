@@ -148,6 +148,7 @@ def examples_csu(
         cs.examples.menuChapter('*BISOS DNS Capability Commands*')
 
     cs.examples.menuSection('/DNS Capability Commands/')
+    cmnd('dnsCap_ensureHostsDblock', comment="# Add banna dblock skeleton to /etc/hosts if missing")
     cmnd('dnsCap_update',   comment="# Update /etc/hosts dblock (sudo)")
     cmnd('dnsCap_verify',   comment="# Verify /etc/hosts has the banna dblock")
     cmnd('dnsCap_resolve',  comment="# Resolve fqdn via getent hosts")
@@ -258,6 +259,109 @@ class dnsCap_verify(cs.Cmnd):
                 missing.append('####+END:')
             b_io.ann.note(f"dnsCap_verify: FAIL -- /etc/hosts missing: {', '.join(missing)}")
             return failed(cmndOutcome)
+
+
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_ensureHostsDblock" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_ensureHostsDblock>>  =verify= argsMax=1 ro=cli   [[elisp:(org-cycle)][| ]]
+#+end_org """
+class dnsCap_ensureHostsDblock(cs.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ ]
+    cmndArgsLen = {'Min': 0, 'Max': 1,}
+
+    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+             rtInv: cs.RtInvoker,
+             cmndOutcome: b.op.Outcome,
+             argsList: typing.Optional[list[str]]=None,
+    ) -> b.op.Outcome:
+
+        failed = b_io.eh.badOutcome
+        callParamsDict = {}
+        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, argsList).isProblematic():
+            return failed(cmndOutcome)
+        cmndArgsSpecDict = self.cmndArgsSpec()
+####+END:
+        self.cmndDocStr(f""" #+begin_org
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] If the target hosts file (arg or =/etc/hosts=) is missing the banna
+=bx:dblock:global:run-result-stdout= dblock, append the empty skeleton so a subsequent
+=dnsCap_update= can expand it. Idempotent -- a no-op when the dblock is already present.
+        #+end_org """)
+
+        import pathlib
+        import datetime
+        import os
+
+        cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
+        hostsFile = pathlib.Path(cmndArgs[0]) if cmndArgs else pathlib.Path('/etc/hosts')
+
+        bannaCommand = 'bannaInfo.cs -i bannaForEtcHosts'
+        hostsContent = hostsFile.read_text()
+        present = any(
+            ('####+BEGIN:' in line) and (bannaCommand in line)
+            for line in hostsContent.splitlines()
+        )
+
+        if present:
+            b_io.ann.note(f"dnsCap_ensureHostsDblock: {hostsFile} already has the banna dblock -- no change")
+            return cmndOutcome.set(opError=b.OpError.Success)
+
+        skeleton = (
+            f'\n\n####+BEGIN: bx:dblock:global:run-result-stdout :command "{bannaCommand}"\n'
+            f'####+END:\n'
+        )
+
+        dateTag = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        backupFile = pathlib.Path(f'{hostsFile}.{dateTag}')
+
+        if os.access(str(hostsFile), os.W_OK):
+            copyResult = subprocess.run(
+                ['cp', str(hostsFile), str(backupFile)],
+                capture_output=True, text=True,
+            )
+        else:
+            copyResult = subprocess.run(
+                ['sudo', 'cp', str(hostsFile), str(backupFile)],
+                capture_output=True, text=True,
+            )
+        if copyResult.returncode != 0:
+            b_io.ann.note(f"ERROR: failed to backup {hostsFile}: {copyResult.stderr}")
+            return failed(cmndOutcome)
+        b_io.ann.note(f"Backed up {hostsFile} to {backupFile}")
+
+        if os.access(str(hostsFile), os.W_OK):
+            with hostsFile.open('a') as hostsFd:
+                hostsFd.write(skeleton)
+        else:
+            appendResult = subprocess.run(
+                ['sudo', 'tee', '-a', str(hostsFile)],
+                input=skeleton, capture_output=True, text=True,
+            )
+            if appendResult.returncode != 0:
+                b_io.ann.note(f"ERROR: failed to append dblock to {hostsFile}: {appendResult.stderr}")
+                return failed(cmndOutcome)
+
+        b_io.ann.note(f"dnsCap_ensureHostsDblock: added banna dblock skeleton to {hostsFile}")
+
+        return cmndOutcome.set(opError=b.OpError.Success)
+
+####+BEGIN: b:py3:cs:method/args :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList "self"
+    """ #+begin_org
+**  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  Mtd-T-anyOrNone [[elisp:(outline-show-subtree+toggle)][||]] /cmndArgsSpec/ deco=default  deco=default  [[elisp:(org-cycle)][| ]]
+    #+end_org """
+    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndArgsSpec(self, ):
+####+END:
+        cmndArgsSpecDict = cs.CmndArgsSpecDict()
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="0&1",
+            argName="cmndArgs",
+            argDefault='',
+            argChoices=[],
+            argDescription="hosts file to ensure (defaults to /etc/hosts)"
+        )
+        return cmndArgsSpecDict
 
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_resolve" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 1 :pyInv ""

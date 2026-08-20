@@ -152,6 +152,14 @@ Verified: developer did the local editable install in dev-bisos3 venv; Claude re
 backs up and rewrites =/etc/hosts=, =dnsCap_resolve airflow.here= -> 127.0.22.100, and
 both =dnsCap_fqdnPing= and =ping -c 3 airflow.here= succeed with 0% packet loss.
 
+* Stage 3 TODOs --- ensureHostsDblocks
+** +
+** TODO [#A] if /etc/hosts is missing bx:dblock:global:run-result-stdout, add it.
+SCHEDULED: <2026-08-19 Wed 18:52>
+Add the ensureHostsDblock Cmnd to _csu and examples.
+####+BEGIN-Verify: bx:dblock:global:run-result-stdout :command "bannaInfo.cs -i bannaForEtcHosts"
+####+END-Verify:
+----- AI Results: ------
 
 ** -
 
