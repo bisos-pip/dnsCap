@@ -184,6 +184,8 @@ class dnsCap_update(cs.Cmnd):
         import datetime
         import shutil
 
+        dnsCap_ensureHostsDblock().pyCmnd(argsList=['/etc/hosts'])
+
         ci = dnsCap_seedInfo.cmndsControlInfo
         hostsFile = pathlib.Path('/etc/hosts')
 
