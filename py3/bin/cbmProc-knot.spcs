@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+""" #+begin_org
+* cbmProc.spcs --- knot (Knot DNS, authoritative) as a bedrock-collective capability
+*
+* Planted location: sys/cbm/collective/bedrock/knot/cbmProc.spcs
+* Realm:            collective
+* CapabilityType:   bedrock    (a capability others are built on; no .here fqdn)
+* CapabilityName:   knot       (BISOS's authoritative DNS server)
+*
+* The CBM walker processes the bedrock capabilityType before all others, so the
+* names hereWeb capabilities are reached by are already served.
+*
+* CBM sits on top of CBS --- it does NOT duplicate CBS content.
+* This file is a *pointer* to the CBS executable. cbm_* verbs
+* subprocess-invoke that executable at dispatch time.
+*
+* cbsSpec resolution:
+*   - "/some/path" or path with '/'  -> use as-is (absolute lock)
+*   - bare basename                  -> shutil.which() against PATH
+#+end_org """
+
+# --- atexit hook: register cbmProc-seed.cs as this file's seed ---
+from bisos.capability import cbmProc_seed  # noqa: F401  _atExit_
+
+# --- declare which capability this leaf represents + point to CBS ---
+from bisos.capability import cbmProc_seedInfo
+
+cbmProc_seedInfo.setup(
+    capabilityName="knot",
+    cbsSpec="/bisos/git/bxRepos/bisos-pip/dnsCap/py3/bin/knot-cbs.pcs",
+)

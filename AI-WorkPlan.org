@@ -164,6 +164,79 @@ Add the ensureHostsDblock Cmnd to _csu and examples.
 ** -
 
 
+* Stage 4: Knot DNS --- BISOS's Authoritative DNS Server, Driven tinydns-style
+
+Goal: Decided 2026-10-10 (bisos-pip/pals/palsWithBcm README.org <<1.2>>): BISOS uses Knot DNS,
+and its -sbom.pcs and everything else Knot-related live in bisos.dnsCap.
+
+* Stage 4 TODOs
+** +
+** TODO [#A] <<knotStartingPoint>> Knot DNS starting point :ai:
+SCHEDULED: <2026-10-10 Sat>
+----- AI Results: ------
+- py3/bisos/dnsCap/knotInfo.py: single source of facts (Debian paths, listen 127.0.53.1@53,
+  zonesDir /var/lib/knot/bisos), ZoneSpec/ZoneRecord, knotConfContent(), zoneFileContent().
+  Zones registry: zoneSpecFuncs = {"here": hereZoneSpec} --- here. is built from banna
+  tcpPorts.hereEntries(), the same source as the /etc/hosts dblock, so both agree.
+- knot.conf is stateless by design: zonefile-load: whole, journal-content: none,
+  zonefile-sync: -1. Unlike app configs elsewhere, it is a build output: regenerated, not
+  written-only-when-absent. Debian's original kept once as knot.conf.debian.
+- py3/bisos/dnsCap/knot_csu.py: Cmnds knotConfStdout, knotZoneStdout, knotZonesUpdate,
+  knotConfUpdate, knotFullUpdate, knotStatus, knotQuery. Publishing validates (kzonecheck,
+  knotc conf-check), installs only when changed --- the zone comparison ignores the SOA line,
+  so an unchanged zone keeps its serial and is not reloaded --- then zone-reload (zones) or
+  restart (knot.conf; listen addresses may change). fullUpdate: zones first, then knot.conf.
+- py3/bin: knotDns.cs (csxu over knot_csu), knot-sbom.pcs (apt knot, knot-dnsutils + the
+  knotDnsSetup pseudo-package = fullUpdate), knot-cbs.pcs (bedrock, sbom only: Debian's
+  knot.service as is), cbmProc-knot.spcs (sys/cbm/collective/bedrock/knot).
+- Verified read-only from source: all menus; generated zone parses (dnspython) and matches
+  banna; publish scripts run end-to-end against a scratch dir with stubbed kzonecheck/knotc/
+  systemctl (fresh host, unchanged re-run keeps serial, knot.conf install + restart). That
+  run caught a bug, fixed: zones are published before knot.conf, so the zone step must create
+  zonesDir itself.
+- NOT verified: real install (knot is not installed on the dev host, a container whose
+  resolv.conf points at Docker's 127.0.0.11), real kzonecheck/knotc behaviour, kdig query.
+- Open: register listenIp (127.0.53.1) in banna; DnsSpecMethod.knot so -here-dns.pcs files
+  publish into Knot; resolver (Unbound recommended, awaiting Mohsen's confirmation); DNSSEC;
+  PALS zones; setup.py scripts dblock needs a Blee update for knotDns.cs and cbmProc-knot.spcs.
+** TODO [#A] <<unboundStartingPoint>> Unbound as BISOS's local resolver, .intra via Knot :ai:
+SCHEDULED: <2026-10-10 Sat>
+----- AI Results: ------
+- Decided (Mohsen, 2026-10-10): Unbound as the local resolver --- privacy (no ISP resolver
+  log), DNSSEC validation, and the place .intra is routed to Knot. .here stays in /etc/hosts
+  (loopback names are per-platform). Built, NOT run: testing happens on another machine.
+- py3/bisos/dnsCap/unboundInfo.py: facts + generators. ResolverMode recursive (default) or
+  forwardTls (Quad9 by default). bisos.conf only: Debian's own unbound.conf.d files
+  (remote-control at /run/unbound.ctl, root trust anchor) are left alone. Stub zone intra. ->
+  Knot 127.0.53.1@53 with domain-insecure, private-domain, do-not-query-localhost: no.
+  Firefox canary use-application-dns.net -> NXDOMAIN. resolv.conf, NetworkManager conf.d
+  (dns=none), NM dispatcher (connection search domains -> forward_add +i to its own DNS
+  servers; removed on down), Firefox policies.json (DNSOverHTTPS key merged into existing
+  policies), Chrome/Chromium managed policy files (DnsOverHttpsMode off).
+- py3/bisos/dnsCap/unbound_csu.py + py3/bin/unboundDns.cs: stdout Cmnds; unboundConfUpdate
+  (install if changed, unbound-checkconf on the real include set, roll back on failure,
+  restart, health check); resolverSwitch (refuses unless Unbound answers; original resolv.conf
+  kept with cp -P as resolv.conf.bisos-orig); browserPoliciesUpdate; unboundFullUpdate (the
+  three in order); resolverRevert; unboundStatus; unboundQuery.
+- py3/bin: unbound-sbom.pcs (unbound, knot-dnsutils + unboundDnsSetup pseudo-package),
+  unbound-cbs.pcs (bedrock, sbom only), cbmProc-unbound.spcs (collective/bedrock/unbound).
+- knotInfo: intra. zone added (SOA/NS only, data source undecided), so .intra gets an
+  authoritative NXDOMAIN. here. remains in Knot only as a test zone.
+- Verified without installing (Debian 13 packages downloaded to scratch and run from there):
+  unbound-checkconf passes for both modes; kzonecheck passes here. and intra. and rejects a
+  broken zone; knotc conf-check passes the generated knot.conf. Stubbed end-to-end run in a
+  scratch dir: publish, switch, policy merge (keeps existing Firefox policies), revert; and
+  resolverSwitch refuses (rc=1, nothing touched) when Unbound does not answer.
+- Bug caught: kzonecheck is in knot-dnssecutils, not knot, on Debian 13 --- added to
+  knotInfo.debPkgs.
+- Known trade-off: Firefox's Encrypted Client Hello needs its DoH; a local DoH endpoint on
+  Unbound (platform CA, palsWithBcm 1.4) is the planned fix.
+- Open: laptop testing of the NM dispatcher on a company/VPN network; whether
+  /etc/firefox/policies/policies.json is the path the test machine's Firefox reads
+  (firefox-esr deb: yes; snap/flatpak: no).
+** -
+
+
 # Local Variables:
 # eval: (setq-local toc-org-max-depth 4)
 # eval: (setq-local org-log-done 'time)
