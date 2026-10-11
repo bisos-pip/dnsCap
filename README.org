@@ -29,6 +29,12 @@ entries in sync.
 =dnsCap_seed.cs= is a seed. Common usages take the form of a
 =<name>-here-dns.pcs= plant that names the fqdn to manage.
 
+dnsCap also holds BISOS's DNS servers, as bedrock capabilities (decided 2026-10-10,
+bisos-pip/pals/palsWithBcm README.org 1.2): *Knot DNS* as the authoritative server, driven
+tinydns-style from generated zone files, and *Unbound* as each platform's local resolver,
+sending =.intra= to Knot. =.here= stays in =/etc/hosts=: its names are loopback addresses,
+meaningful only on the platform itself. See [[#knot-dns-and-unbound][Knot DNS and Unbound]].
+
 * Table of Contents     :TOC:
 - [[#overview][Overview]]
 - [[#relation-to-bisos-capabilities][Relation to BISOS Capabilities]]
@@ -40,6 +46,9 @@ entries in sync.
 - [[#usage][Usage]]
   - [[#example-managing-airflowhere-in-etchosts][Example: managing airflow.here in /etc/hosts]]
   - [[#commands][Commands]]
+- [[#knot-dns-and-unbound][Knot DNS and Unbound]]
+  - [[#knot-dns-----authoritative-tinydns-style][Knot DNS --- authoritative, tinydns-style]]
+  - [[#unbound-----the-platforms-local-resolver][Unbound --- the platform's local resolver]]
 - [[#key-files][Key Files]]
 - [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
 - [[#support][Support]]
@@ -165,6 +174,51 @@ and =ping airflow.here= then resolves to =127.0.22.100=.
 | =dnsCap_resolve=  | Resolve the fqdn via =getent hosts=.                            |
 | =dnsCap_fqdnPing= | Ping the fqdn once to confirm the entry is in effect.           |
 
+* Knot DNS and Unbound
+
+Both are built but not yet run on a host; testing is on another machine. Design and open
+items: =AI-WorkPlan.org= Stage 4 (=<<knotStartingPoint>>=, =<<unboundStartingPoint>>=).
+
+| Names              | Scope         | Resolved by                                             |
+|--------------------+---------------+---------------------------------------------------------|
+| =.here=            | this platform | =/etc/hosts= (=dnsCap_update=, above)                   |
+| =.intra=           | this site     | Unbound -> stub zone -> Knot (=127.0.53.1@53=)          |
+| everything else    | the world     | Unbound, full recursion with DNSSEC validation          |
+
+** Knot DNS --- authoritative, tinydns-style
+
+BISOS data is the single source. dnsCap generates plain zone files and =knot.conf=,
+validates them (=kzonecheck=, =knotc conf-check=), installs them only when changed --- an
+unchanged zone keeps its SOA serial --- and publishes with =knotc zone-reload=. The server
+keeps no state of its own (=zonefile-load: whole=, =journal-content: none=,
+=zonefile-sync: -1=). Zones: =here.= (from banna, for testing only) and =intra.= (SOA/NS so
+far). Debian's =knot.service= is used as is.
+
+#+begin_src bash
+knot-sbom.pcs -i sbom_fullUpdate          # knot, knot-dnssecutils, knot-dnsutils; then publish
+knotDns.cs -i knotZoneStdout here         # a zone as it would be generated (writes nothing)
+knotDns.cs -i knotFullUpdate              # zones, then knot.conf
+knotDns.cs -i knotQuery kafka.here        # kdig @127.0.53.1
+#+end_src
+
+** Unbound --- the platform's local resolver
+
+Full recursion by default (no ISP resolver log), DNSSEC validation, QNAME minimisation; a
+=forwardTls= mode forwards over DNS-over-TLS instead. Company/VPN domains are forwarded to
+their connection's own DNS servers by a NetworkManager dispatcher. Firefox and
+Chrome/Chromium policies turn their DNS-over-HTTPS off, so they use this resolver.
+=/etc/resolv.conf= is switched only after Unbound answers; =resolverRevert= undoes it.
+
+#+begin_src bash
+unbound-sbom.pcs -i sbom_fullUpdate       # unbound; then conf, switch, browser policies
+unboundDns.cs -i unboundConfStdout        # bisos.conf as it would be generated
+unboundDns.cs -i unboundQuery debian.org  # kdig @127.0.0.1
+unboundDns.cs -i resolverRevert           # restore the original resolv.conf
+#+end_src
+
+Known trade-off: with its DoH off, Firefox does not use Encrypted Client Hello. A local DoH
+endpoint on Unbound (needs the platform CA, palsWithBcm 1.4) is the planned fix.
+
 * Key Files
 
 - =py3/bin/dnsCap_seed.cs= — the seed entry point.
@@ -173,6 +227,11 @@ and =ping airflow.here= then resolves to =127.0.22.100=.
 - =py3/bisos/dnsCap/dnsCap_csu.py= — the four =dnsCap_*= commands.
 - =py3/bisos/dnsCap/dnsCap_seedInfo.py= — =DnsSpecMethod= enum (=etcHosts=,
   =tinydns=) and the =fqdn= / =dnsSpecMethod= control info.
+- =py3/bisos/dnsCap/knotInfo.py=, =knot_csu.py=, =py3/bin/knotDns.cs= — Knot DNS: facts and
+  generators, Cmnds, entry point. =knot-sbom.pcs=, =knot-cbs.pcs=, =cbmProc-knot.spcs= —
+  its sbom, bedrock CBS and CBM leaf (=collective/bedrock/knot=).
+- =py3/bisos/dnsCap/unboundInfo.py=, =unbound_csu.py=, =py3/bin/unboundDns.cs= — Unbound,
+  likewise; =unbound-sbom.pcs=, =unbound-cbs.pcs=, =cbmProc-unbound.spcs=.
 
 * Documentation and Blee-Panels
 
@@ -191,7 +250,11 @@ author/maintainer\\
 
 * Planned Improvements
 
-- Implement the =tinydns= backend (=DnsSpecMethod.tinydns= is currently a placeholder).
+- =DnsSpecMethod.knot=, so a =-here-dns.pcs= plant can publish into Knot. (The =tinydns=
+  placeholder is superseded: BISOS uses Knot DNS, palsWithBcm 1.2.)
+- Run Knot and Unbound on a real host; then DNSSEC (palsWithBcm 1.6) and the =.intra= data source.
+- The certificate aspect: a planted =*-cert.pcs= beside each =*-here-dns.pcs= (bisos.crypt
+  README.org, "BISOS Certificates --- Umbrella Design").
 - Handle =dnsCap_update= on a fresh =/etc/hosts= with no pre-existing dblock markers.
 
 # Local Variables:

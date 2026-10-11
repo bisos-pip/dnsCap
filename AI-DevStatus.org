@@ -27,6 +27,22 @@ Fill in the sections below when asked to update, following the structure provide
 
 * Current State
 
+  2026-10-10 (from a bisos-pip/kafka session; commit e0e8017) --- Stage 4 of AI-WorkPlan.org:
+  - Knot DNS (authoritative, tinydns-style) and Unbound (local resolver, .intra stubbed to
+    Knot) added as bedrock capabilities: knotInfo/knot_csu/knotDns.cs/knot-sbom/knot-cbs/
+    cbmProc-knot and unboundInfo/unbound_csu/unboundDns.cs/unbound-sbom/unbound-cbs/
+    cbmProc-unbound. Decisions: pals/palsWithBcm README.org 1.2.
+  - Built, NOT run on any host: testing is on another machine. Checked with Debian 13's own
+    tools from unpacked packages (unbound-checkconf, kzonecheck, knotc conf-check) and by
+    stubbed end-to-end runs in a scratch dir. Details and open items: AI-WorkPlan.org
+    <<knotStartingPoint>> and <<unboundStartingPoint>>.
+  - .here stays in /etc/hosts (dnsCap_update, below): loopback names are per-platform.
+  - Next here: the cert aspect (a planted *-cert.pcs beside each *-here-dns.pcs), per the
+    certificates design (bisos.crypt README.org, "BISOS Certificates --- Umbrella Design").
+  - setup.py's scripts dblock still needs a Blee update to pick up knotDns.cs, unboundDns.cs
+    and the cbmProc-*.spcs files.
+
+
   Package renamed =capDns= -> =dnsCap= (2026-08-05, Stage 2 last TODO). The repo dir,
   the =py3/bisos/dnsCap/= package, its three modules (=dnsCap_csu.py=,
   =dnsCap_seedInfo.py=, =dnsCap_seed.py=), the seed =py3/bin/dnsCap_seed.cs=, the
