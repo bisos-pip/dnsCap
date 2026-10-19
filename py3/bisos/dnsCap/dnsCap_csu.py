@@ -148,15 +148,23 @@ def examples_csu(
         cs.examples.menuChapter('*BISOS DNS Capability Commands*')
 
     cs.examples.menuSection('/DNS Capability Commands/')
-    cmnd('dnsCap_ensureHostsDblock', comment="# Add banna dblock skeleton to /etc/hosts if missing")
-    cmnd('dnsCap_update',   comment="# Update /etc/hosts dblock (sudo)")
-    cmnd('dnsCap_verify',   comment="# Verify /etc/hosts has the banna dblock")
+    cmnd('dnsCap_ensureHostsDblock', comment="# Add missing dblock skeletons (banna's, or the planted file's) to /etc/hosts")
+    cmnd('dnsCap_update',   comment="# Run the planted file's preUpdateFuncs, then update /etc/hosts dblocks (sudo)")
+    cmnd('dnsCap_verify',   comment="# Verify /etc/hosts has its dblocks")
     cmnd('dnsCap_resolve',  comment="# Resolve fqdn via getent hosts")
     cmnd('dnsCap_fqdnPing', comment="# Ping fqdn once")
     cmnd('dnsCap_fqdnPing', comment="ping airflow.here  # Direct ping to verify /etc/hosts entry")
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_update" :comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
+def _hostsDblockPresent(hostsContent: str, dblockCommand: str) -> bool:
+    """True when hostsContent has a BEGIN line of the dblock whose command is dblockCommand."""
+    return any(
+        ('####+BEGIN:' in line) and (dblockCommand in line)
+        for line in hostsContent.splitlines()
+    )
+
+
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "dnsCap_update":comment "" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
 *  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<dnsCap_update>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
@@ -184,9 +192,15 @@ class dnsCap_update(cs.Cmnd):
         import datetime
         import shutil
 
-        dnsCap_ensureHostsDblock().pyCmnd(argsList=['/etc/hosts'])
-
         ci = dnsCap_seedInfo.cmndsControlInfo
+
+        for preUpdateFunc in ci.preUpdateFuncs or []:
+            if not preUpdateFunc():
+                b_io.ann.note(f"ERROR: dnsCap_update: {preUpdateFunc.__name__} failed --- /etc/hosts not touched")
+                return failed(cmndOutcome)
+
+        if dnsCap_ensureHostsDblock().pyCmnd(argsList=['/etc/hosts']).isProblematic():
+            return failed(cmndOutcome)
         hostsFile = pathlib.Path('/etc/hosts')
 
         dateTag = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -247,18 +261,19 @@ class dnsCap_verify(cs.Cmnd):
         #+end_org """)
 
         hostsContent = open('/etc/hosts').read()
-        hasBegin = '####+BEGIN:' in hostsContent
         hasEnd = '####+END:' in hostsContent
+        missing = [
+            dblockCommand for dblockCommand in dnsCap_seedInfo.hostsDblockCommands()
+            if not _hostsDblockPresent(hostsContent, dblockCommand)
+        ]
+        if not hasEnd:
+            missing.append('####+END:')
 
-        if hasBegin and hasEnd:
-            b_io.ann.note("dnsCap_verify: /etc/hosts has banna dblock (BEGIN and END markers present)")
+        if not missing:
+            b_io.ann.note("dnsCap_verify: /etc/hosts has the dblocks of: "
+                          + ", ".join(dnsCap_seedInfo.hostsDblockCommands()))
             return cmndOutcome.set(opError=b.OpError.Success)
         else:
-            missing = []
-            if not hasBegin:
-                missing.append('####+BEGIN:')
-            if not hasEnd:
-                missing.append('####+END:')
             b_io.ann.note(f"dnsCap_verify: FAIL -- /etc/hosts missing: {', '.join(missing)}")
             return failed(cmndOutcome)
 
@@ -286,9 +301,10 @@ class dnsCap_ensureHostsDblock(cs.Cmnd):
         cmndArgsSpecDict = self.cmndArgsSpec()
 ####+END:
         self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]] If the target hosts file (arg or =/etc/hosts=) is missing the banna
-=bx:dblock:global:run-result-stdout= dblock, append the empty skeleton so a subsequent
-=dnsCap_update= can expand it. Idempotent -- a no-op when the dblock is already present.
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]] For each dblock command of =hostsDblockCommands()= (banna's
+unless the planted file names others) that the target hosts file (arg or =/etc/hosts=) lacks, append
+an empty =bx:dblock:global:run-result-stdout= skeleton so a subsequent =dnsCap_update= can expand it.
+Idempotent -- a no-op when every dblock is already present.
         #+end_org """)
 
         import pathlib
@@ -298,24 +314,26 @@ class dnsCap_ensureHostsDblock(cs.Cmnd):
         cmndArgs = self.cmndArgsGet("0&1", cmndArgsSpecDict, argsList)
         hostsFile = pathlib.Path(cmndArgs[0]) if cmndArgs else pathlib.Path('/etc/hosts')
 
-        bannaCommand = 'bannaInfo.cs -i bannaForEtcHosts'
         hostsContent = hostsFile.read_text()
-        present = any(
-            ('####+BEGIN:' in line) and (bannaCommand in line)
-            for line in hostsContent.splitlines()
-        )
+        absentCommands = [
+            dblockCommand for dblockCommand in dnsCap_seedInfo.hostsDblockCommands()
+            if not _hostsDblockPresent(hostsContent, dblockCommand)
+        ]
 
-        if present:
-            b_io.ann.note(f"dnsCap_ensureHostsDblock: {hostsFile} already has the banna dblock -- no change")
+        if not absentCommands:
+            b_io.ann.note(f"dnsCap_ensureHostsDblock: {hostsFile} already has its dblocks -- no change")
             return cmndOutcome.set(opError=b.OpError.Success)
 
-        skeleton = (
-            f'\n\n####+BEGIN: bx:dblock:global:run-result-stdout :command "{bannaCommand}"\n'
+        skeleton = "".join(
+            f'\n\n####+BEGIN: bx:dblock:global:run-result-stdout :command "{dblockCommand}"\n'
             f'####+END:\n'
+            for dblockCommand in absentCommands
         )
 
         dateTag = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        backupFile = pathlib.Path(f'{hostsFile}.{dateTag}')
+        # .preEnsure: dnsCap_update backs up again as <hostsFile>.<dateTag> within the same second,
+        # which would otherwise overwrite this backup of the original.
+        backupFile = pathlib.Path(f'{hostsFile}.{dateTag}.preEnsure')
 
         if os.access(str(hostsFile), os.W_OK):
             copyResult = subprocess.run(
@@ -344,7 +362,8 @@ class dnsCap_ensureHostsDblock(cs.Cmnd):
                 b_io.ann.note(f"ERROR: failed to append dblock to {hostsFile}: {appendResult.stderr}")
                 return failed(cmndOutcome)
 
-        b_io.ann.note(f"dnsCap_ensureHostsDblock: added banna dblock skeleton to {hostsFile}")
+        b_io.ann.note(f"dnsCap_ensureHostsDblock: added to {hostsFile} the dblock skeletons of: "
+                      + ", ".join(absentCommands))
 
         return cmndOutcome.set(opError=b.OpError.Success)
 

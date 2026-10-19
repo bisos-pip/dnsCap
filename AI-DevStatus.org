@@ -27,6 +27,21 @@ Fill in the sections below when asked to update, following the structure provide
 
 * Current State
 
+  2026-10-18 (for bisos.pals's PALS .here names; uncommitted) --- not a WorkPlan item here; planned in
+  =bro_rawBisos/bro_rawBisosPals/bySmb/libreHalaalFoundation/web/astro/AI-WorkPlan.org= 2.1:
+  - =CmndsControlInfo.hostsDblockCommands= (None: banna's only, =bannaHostsDblockCommand=) and
+    =hostsDblockCommands()=: the /etc/hosts dblocks to create and verify. bisos.pals's
+    =pals-here-dns.spcs= names banna's and palsHere's (=palsHereInfo.cs -i palsForEtcHosts=). Existing
+    =*-here-dns.pcs= set nothing and are unchanged in behaviour (checked with kafka-here-dns.pcs).
+  - =CmndsControlInfo.preUpdateFuncs=: called by =dnsCap_update= before it touches /etc/hosts; one
+    returning False fails the update (bisos.pals adds the PALS's name to its list there).
+  - =dnsCap_update= now fails when =dnsCap_ensureHostsDblock= fails (its result was ignored).
+  - Fixed: ensure's backup and update's, made in the same second, had one name, so update's overwrote
+    the original; ensure's is now =<file>.<dateTag>.preEnsure=. (It happened once on the dev host:
+    =/etc/hosts.20261018231503= is not the original.)
+  - Installed editable in bisos3 (it was the PyPI 0.14 copy). AI-Outputs.org entry: "dnsCap_ensureHostsDblock
+    creates only banna's /etc/hosts block" (DONE).
+
   2026-10-10 (from a bisos-pip/kafka session; commit e0e8017) --- Stage 4 of AI-WorkPlan.org:
   - Knot DNS (authoritative, tinydns-style) and Unbound (local resolver, .intra stubbed to
     Knot) added as bedrock capabilities: knotInfo/knot_csu/knotDns.cs/knot-sbom/knot-cbs/
@@ -79,7 +94,8 @@ Fill in the sections below when asked to update, following the structure provide
 * Architecture
 
   - =py3/bisos/dnsCap/dnsCap_seedInfo.py= — =DnsSpecMethod= enum (=etcHosts=, =tinydns=)
-    and =CmndsControlInfo= dataclass with =fqdn= and =dnsSpecMethod= fields.
+    and =CmndsControlInfo= dataclass with =fqdn=, =dnsSpecMethod=, =hostsDblockCommands= and
+    =preUpdateFuncs= fields; =hostsDblockCommands()= (default: banna's).
   - =py3/bisos/dnsCap/dnsCap_csu.py= — CS-Lib with four commands:
     =dnsCap_update=, =dnsCap_verify=, =dnsCap_resolve=, =dnsCap_fqdnPing=.
   - =py3/bisos/dnsCap/dnsCap_seed.py= — seed library (standard bisos-pip pattern).
@@ -98,16 +114,19 @@ Fill in the sections below when asked to update, following the structure provide
   - =dnsCap_update= — safe-copies =/etc/hosts= to =/etc/hosts.<dateTag>=, then runs
     =sudo -E PATH=... <python> <py-dblock.cs> -i updateDblocks /etc/hosts=, expanding
     the =bx:dblock:global:run-result-stdout= block that calls =bannaInfo.cs -i bannaForEtcHosts=.
-  - =dnsCap_verify= — reads =/etc/hosts= and confirms both =####+BEGIN:= and =####+END:=
-    markers are present.
+  - =dnsCap_verify= — reads =/etc/hosts= and confirms a =####+BEGIN:= line for each of
+    =hostsDblockCommands()= and an =####+END:= are present.
+  - =dnsCap_ensureHostsDblock= with banna's and palsHere's blocks (2026-10-18): on a copy of /etc/hosts
+    only the missing palsHere skeleton was added, a second run changed nothing; on the real file
+    =libre-halaal.org.here= then resolved to 127.0.55.1.
   - =dnsCap_resolve= — accepts optional fqdn arg, calls =getent hosts <fqdn>=.
   - =dnsCap_fqdnPing= — calls =ping -c 1 <fqdn>=, 0% packet loss verified.
   - =verify.sh= — full end-to-end pass including =ping -c 3 airflow.here=.
 
 * What Is Untested
 
-  - =dnsCap_update= on a fresh =/etc/hosts= without pre-existing dblock markers
-    (=dnsCap_verify= would need to handle that case).
+  - =dnsCap_update= on a fresh =/etc/hosts= without pre-existing dblock markers: ensure (0.14) adds
+    them, but that path has run on the dev host only with banna's block already present.
   - =tinydns= backend (=DnsSpecMethod.tinydns= is a placeholder; only =etcHosts= is implemented).
   - PyPI upload and =pipx install= end-to-end.
 
@@ -125,6 +144,9 @@ Fill in the sections below when asked to update, following the structure provide
     by name alone.
   - The =.pcs= file sets both =fqdn= and =dnsSpecMethod= on =cntrlInfo= before
     declaring the =csCmndsList= — this is the standard dnsCap usage pattern.
+  - dnsCap, not each caller, creates every /etc/hosts dblock (user, 2026-10-18): a planted file names
+    the blocks it needs in =hostsDblockCommands=; nothing pals-specific is in dnsCap. =preUpdateFuncs=
+    keeps =-i dnsCap_update= the single trigger for a caller that must record something first.
   - =examples_csu= must be a plain =@cs.track def= function (not a =cs.Cmnd= class)
     to avoid a framework =perfName= AttributeError when invoked via =dnsCap_seed.cs -i examples_csu=.
 

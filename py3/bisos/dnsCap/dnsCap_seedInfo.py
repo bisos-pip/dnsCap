@@ -108,6 +108,13 @@ class CmndsControlInfo(object):
 
     dnsSpecMethod: DnsSpecMethod | None = None
     fqdn: str | None = None
+    # The commands of the /etc/hosts dblocks dnsCap_ensureHostsDblock creates when absent.
+    # None: banna's only (bannaHostsDblockCommand). A planted file that needs another block
+    # (e.g. bisos.pals's palsHere) lists it, with banna's.
+    hostsDblockCommands: list[str] | None = None
+    # Called, in order, by dnsCap_update before it touches /etc/hosts (e.g. bisos.pals records the
+    # planted file's .here name in its list). One returning False fails the update.
+    preUpdateFuncs: list[typing.Callable[[], bool]] | None = None
 
 ####+BEGIN: b:py3:class/singleton  :comment ""
     """ #+begin_org
@@ -122,6 +129,12 @@ class CmndsControlInfo(object):
 
 # Singleton Instantiation
 cmndsControlInfo = CmndsControlInfo()
+
+bannaHostsDblockCommand = 'bannaInfo.cs -i bannaForEtcHosts'
+
+def hostsDblockCommands() -> list[str]:
+    """The /etc/hosts dblock commands to ensure: the planted file's, else banna's."""
+    return cmndsControlInfo.hostsDblockCommands or [bannaHostsDblockCommand]
 
 
 ####+BEGIN: b:py3:class/decl :className "DnsCapSeedInfo" :superClass "object" :classType "basic" :deco "@dataclass" :comment "Abstraction of a  Interface"

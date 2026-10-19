@@ -45,6 +45,7 @@ meaningful only on the platform itself. See [[#knot-dns-and-unbound][Knot DNS an
   - [[#installation-with-pipx][Installation With pipx]]
 - [[#usage][Usage]]
   - [[#example-managing-airflowhere-in-etchosts][Example: managing airflow.here in /etc/hosts]]
+  - [[#other-etchosts-blocks-and-work-before-the-update][Other /etc/hosts blocks, and work before the update]]
   - [[#commands][Commands]]
 - [[#knot-dns-and-unbound][Knot DNS and Unbound]]
   - [[#knot-dns-----authoritative-tinydns-style][Knot DNS --- authoritative, tinydns-style]]
@@ -165,25 +166,41 @@ After =dnsCap_update=, =/etc/hosts= contains a banna-generated block, e.g.:
 
 and =ping airflow.here= then resolves to =127.0.22.100=.
 
+** Other /etc/hosts blocks, and work before the update
+
+A plant may need a block other than banna's, and something done before =/etc/hosts= is touched.
+Two more control-info fields cover that; a plant that sets neither gets banna's block only:
+
+- =cntrlInfo.hostsDblockCommands= --- the commands of the dblocks to create (when absent) and verify,
+  e.g. =[dnsCap_seedInfo.bannaHostsDblockCommand, "palsHereInfo.cs -i palsForEtcHosts"]=.
+- =cntrlInfo.preUpdateFuncs= --- functions =dnsCap_update= calls first; one returning False fails the
+  update before =/etc/hosts= is touched.
+
+bisos.pals's =pals-here-dns.spcs= sets both (=palsHere.dnsCapSetup()=): it adds the PALS's =.here=
+name to its list, then has its =127.0.55.x= block created and filled beside banna's.
+
 ** Commands
 
-| Command           | What it does                                                    |
-|-------------------+-----------------------------------------------------------------|
-| =dnsCap_update=   | Safe-copy =/etc/hosts=, then rewrite its banna dblock (sudo).   |
-| =dnsCap_verify=   | Check that =/etc/hosts= has the banna dblock BEGIN/END markers. |
-| =dnsCap_resolve=  | Resolve the fqdn via =getent hosts=.                            |
-| =dnsCap_fqdnPing= | Ping the fqdn once to confirm the entry is in effect.           |
+| Command                    | What it does                                                       |
+|----------------------------+--------------------------------------------------------------------|
+| =dnsCap_update=            | Run =preUpdateFuncs=, ensure the dblocks, safe-copy =/etc/hosts=,  |
+|                            | then rewrite its dblocks (sudo).                                   |
+| =dnsCap_ensureHostsDblock= | Append an empty skeleton for each missing dblock (backup first:    |
+|                            | =<file>.<dateTag>.preEnsure=).                                     |
+| =dnsCap_verify=            | Check that =/etc/hosts= has a BEGIN line for each dblock, and END. |
+| =dnsCap_resolve=           | Resolve the fqdn via =getent hosts=.                               |
+| =dnsCap_fqdnPing=          | Ping the fqdn once to confirm the entry is in effect.              |
 
 * Knot DNS and Unbound
 
 Both are built but not yet run on a host; testing is on another machine. Design and open
 items: =AI-WorkPlan.org= Stage 4 (=<<knotStartingPoint>>=, =<<unboundStartingPoint>>=).
 
-| Names              | Scope         | Resolved by                                             |
-|--------------------+---------------+---------------------------------------------------------|
-| =.here=            | this platform | =/etc/hosts= (=dnsCap_update=, above)                   |
-| =.intra=           | this site     | Unbound -> stub zone -> Knot (=127.0.53.1@53=)          |
-| everything else    | the world     | Unbound, full recursion with DNSSEC validation          |
+| Names           | Scope         | Resolved by                                    |
+|-----------------+---------------+------------------------------------------------|
+| =.here=         | this platform | =/etc/hosts= (=dnsCap_update=, above)          |
+| =.intra=        | this site     | Unbound -> stub zone -> Knot (=127.0.53.1@53=) |
+| everything else | the world     | Unbound, full recursion with DNSSEC validation |
 
 ** Knot DNS --- authoritative, tinydns-style
 
