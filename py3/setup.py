@@ -43,7 +43,7 @@ def longDescription():
 # b:py3:pypi:setup/version Arguments  :forSys t :forPyPi t :constant "666"
 ####+BEGIN: b:py3:pypi:setup/version :comment "Auto Detected"
 
-# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.14 -- forLocalVersion=0.1 -- constant=NA
+# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.15 -- forLocalVersion=0.1 -- constant=NA
 def pkgVersion():
         return '0.1'
 
@@ -55,9 +55,11 @@ def pkgVersion():
 requires = [
 "bisos",
 "bisos.b",
+"bisos.capability",
 "bisos.common",
 "bisos.csPlayer",
 "bisos.csSeed",
+"bisos.sbom",
 "setuptools==75.8.0",
 "wheel==0.38.4",
 ]
@@ -68,8 +70,16 @@ requires = [
 
 scripts = [
 'bin/airflow-here-dns.pcs',
+'bin/cbmProc-knot.spcs',
+'bin/cbmProc-unbound.spcs',
 'bin/dnsCap_seed.cs',
 'bin/exmpl-here-dns.pcs',
+'bin/knot-cbs.pcs',
+'bin/knotDns.cs',
+'bin/knot-sbom.pcs',
+'bin/unbound-cbs.pcs',
+'bin/unboundDns.cs',
+'bin/unbound-sbom.pcs',
 ]
 ####+END:
 
