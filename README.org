@@ -44,7 +44,7 @@ meaningful only on the platform itself. See [[#knot-dns-and-unbound][Knot DNS an
   - [[#installation-with-pip][Installation With pip]]
   - [[#installation-with-pipx][Installation With pipx]]
 - [[#usage][Usage]]
-  - [[#example-managing-airflowhere-in-etchosts][Example: managing airflow.internal in /etc/hosts]]
+  - [[#example-managing-airflowinternal-in-etchosts][Example: managing airflow.internal in /etc/hosts]]
   - [[#other-etchosts-blocks-and-work-before-the-update][Other /etc/hosts blocks, and work before the update]]
   - [[#commands][Commands]]
 - [[#knot-dns-and-unbound][Knot DNS and Unbound]]
