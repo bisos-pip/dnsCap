@@ -115,7 +115,7 @@ def examples_csu() -> b.op.Outcome:
     literal("knotc --version")
     literal("systemctl status knot.service")
     literal("knotDns.cs -i knotStatus")
-    literal("knotDns.cs -i knotQuery kafka.here")
+    literal("knotDns.cs -i knotQuery kafka.internal")
 
     cs.examples.menuChapter('*End-Of Knot DNS -- sbom Examples*')
     return cmndOutcome

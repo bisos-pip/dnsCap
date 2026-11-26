@@ -5,7 +5,7 @@
 *
 * Planted location: sys/cbm/collective/bedrock/unbound/cbmProc.spcs
 * Realm:            collective
-* CapabilityType:   bedrock    (a capability others are built on; no .here fqdn)
+* CapabilityType:   bedrock    (a capability others are built on; no .internal fqdn)
 * CapabilityName:   unbound    (BISOS's local resolver)
 *
 * The CBM walker processes the bedrock capabilityType before all others. Unbound does

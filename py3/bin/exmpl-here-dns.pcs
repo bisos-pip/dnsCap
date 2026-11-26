@@ -15,7 +15,7 @@ from bisos.dnsCap import dnsCap_seedInfo
 cntrlInfo = dnsCap_seedInfo.cmndsControlInfo
 
 cntrlInfo.dnsSpecMethod = dnsCap_seedInfo.DnsSpecMethod.etcHosts
-cntrlInfo.fqdn = "exmpl.here"
+cntrlInfo.fqdn = "exmpl.internal"
 
 from bisos.csSeed import csCmndsList_seedInfo
 csCmnd = csCmndsList_seedInfo.csCmnd

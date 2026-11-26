@@ -15,7 +15,7 @@ from bisos.dnsCap import dnsCap_seedInfo
 cntrlInfo = dnsCap_seedInfo.cmndsControlInfo
 
 cntrlInfo.dnsSpecMethod = dnsCap_seedInfo.DnsSpecMethod.etcHosts   # Other choice is tinydns
-cntrlInfo.fqdn = "airflow.here"
+cntrlInfo.fqdn = "airflow.internal"
 
 from bisos.csSeed import csCmndsList_seedInfo
 csCmnd = csCmndsList_seedInfo.csCmnd

@@ -12,7 +12,7 @@ network's (ISP's) resolver:
    keeps a log of the names looked up. Forwarding over DNS-over-TLS to chosen upstreams is the
    alternative mode (the ISP then sees no DNS at all; the chosen provider sees all of it).
 ** The zones Knot serves for the site (intra.) are stub zones pointing at Knot.
-   here. is deliberately NOT stubbed: .here names are loopback addresses, meaningful only on
+   internal. is deliberately NOT stubbed: .internal names are loopback addresses, meaningful only on
    this platform, and stay in /etc/hosts.
 ** Company/VPN domains: a NetworkManager dispatcher script forwards the search domains a
    connection brings to that connection's own DNS servers, and removes them when it goes down.
@@ -74,7 +74,7 @@ class UnboundInfo:
 
     listenAddrs: tuple[str, ...] = ("127.0.0.1", "::1")
 
-    # The zones Knot serves that this resolver sends to Knot. Not here. --- see Description.
+    # The zones Knot serves that this resolver sends to Knot. Not internal. --- see Description.
     stubZones: tuple[str, ...] = ("intra",)
 
     # Mozilla's canary: NXDOMAIN tells Firefox not to switch DNS-over-HTTPS on by default.

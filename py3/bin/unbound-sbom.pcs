@@ -70,7 +70,7 @@ class readme(cs.Cmnd):
         stubs = ", ".join(f"{z}." for z in i.stubZones)
         descriptionStr = f"""\
 ** Scope: Unbound -- BISOS's local resolver, mode={i.mode.value}, listening on {", ".join(i.listenAddrs)}.
-   {stubs} is stubbed to Knot ({knotInfo.listenAddr}). .here stays in /etc/hosts.
+   {stubs} is stubbed to Knot ({knotInfo.listenAddr}). .internal stays in /etc/hosts.
 
 ** What this installs and changes, in order (unboundDns.cs -i unboundFullUpdate):
   1) apt packages: {", ".join(i.debPkgs)}.

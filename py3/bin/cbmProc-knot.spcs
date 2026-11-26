@@ -5,7 +5,7 @@
 *
 * Planted location: sys/cbm/collective/bedrock/knot/cbmProc.spcs
 * Realm:            collective
-* CapabilityType:   bedrock    (a capability others are built on; no .here fqdn)
+* CapabilityType:   bedrock    (a capability others are built on; no .internal fqdn)
 * CapabilityName:   knot       (BISOS's authoritative DNS server)
 *
 * The CBM walker processes the bedrock capabilityType before all others, so the

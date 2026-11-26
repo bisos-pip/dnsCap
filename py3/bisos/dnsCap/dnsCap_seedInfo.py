@@ -113,7 +113,7 @@ class CmndsControlInfo(object):
     # (e.g. bisos.pals's palsHere) lists it, with banna's.
     hostsDblockCommands: list[str] | None = None
     # Called, in order, by dnsCap_update before it touches /etc/hosts (e.g. bisos.pals records the
-    # planted file's .here name in its list). One returning False fails the update.
+    # planted file's .internal name in its list). One returning False fails the update.
     preUpdateFuncs: list[typing.Callable[[], bool]] | None = None
 
 ####+BEGIN: b:py3:class/singleton  :comment ""

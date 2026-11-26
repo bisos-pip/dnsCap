@@ -149,9 +149,9 @@ def examples_csu(
 
     cs.examples.menuSection('/Observe/')
     cmnd('knotStatus', comment="# knot.service and every zone's status")
-    cmnd('knotQuery', args='kafka.here', comment=f"# kdig @{knotInfo.listenIp}, answer only")
-    literal(f"kdig @{knotInfo.listenIp} -p {knotInfo.listenPort} here. SOA")
-    literal(f"kdig @{knotInfo.listenIp} -p {knotInfo.listenPort} here. AXFR   # refused: no ACL allows transfers")
+    cmnd('knotQuery', args='kafka.internal', comment=f"# kdig @{knotInfo.listenIp}, answer only")
+    literal(f"kdig @{knotInfo.listenIp} -p {knotInfo.listenPort} internal. SOA")
+    literal(f"kdig @{knotInfo.listenIp} -p {knotInfo.listenPort} internal. AXFR   # refused: no ACL allows transfers")
     literal("journalctl -u knot.service -n 50")
 
 
@@ -317,7 +317,7 @@ class knotZoneStdout(cs.Cmnd):
             argName="cmndArgs",
             argDefault='',
             argChoices=[],
-            argDescription="a zone this host serves, e.g. here"
+            argDescription="a zone this host serves, e.g. internal"
         )
         return cmndArgsSpecDict
 

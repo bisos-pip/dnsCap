@@ -153,7 +153,7 @@ def examples_csu(
     cmnd('dnsCap_verify',   comment="# Verify /etc/hosts has its dblocks")
     cmnd('dnsCap_resolve',  comment="# Resolve fqdn via getent hosts")
     cmnd('dnsCap_fqdnPing', comment="# Ping fqdn once")
-    cmnd('dnsCap_fqdnPing', comment="ping airflow.here  # Direct ping to verify /etc/hosts entry")
+    cmnd('dnsCap_fqdnPing', comment="ping airflow.internal  # Direct ping to verify /etc/hosts entry")
 
 
 def _hostsDblockPresent(hostsContent: str, dblockCommand: str) -> bool:

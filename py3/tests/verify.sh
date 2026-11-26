@@ -23,9 +23,9 @@ lpDo ../bin/airflow-here-dns.pcs -i dnsCap_ensureHostsDblock
 lpDo ../bin/airflow-here-dns.pcs -i dnsCap_verify
 lpDo ../bin/airflow-here-dns.pcs -i dnsCap_update
 lpDo cat /etc/hosts
-lpDo ../bin/airflow-here-dns.pcs -i dnsCap_resolve  airflow.here
-lpDo ../bin/airflow-here-dns.pcs -i dnsCap_fqdnPing  airflow.here
-lpDo ping -c 3 airflow.here
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_resolve  airflow.internal
+lpDo ../bin/airflow-here-dns.pcs -i dnsCap_fqdnPing  airflow.internal
+lpDo ping -c 3 airflow.internal
 
 
 # --- Knot DNS (authoritative): read-only generation; nothing installed or started ---
@@ -36,11 +36,11 @@ lpDo ../bin/knot-sbom.pcs -i readme
 lpDo python3 -c "
 import dns.zone
 from bisos.dnsCap import knotInfo as k
-zone = dns.zone.from_text(k.zoneFileContent(k.zoneSpecOf('here')), origin='here.', relativize=False)
+zone = dns.zone.from_text(k.zoneFileContent(k.zoneSpecOf('internal')), origin='internal.', relativize=False)
 from bisos.banna import tcpPorts
 missing = [n for ip, n, _ in tcpPorts.hereEntries()
-           if str(zone.find_rdataset(n + '.here.', 'A')[0]) != ip]
-print('here. zone agrees with banna hereEntries' if not missing else f'MISMATCH: {missing}')
+           if str(zone.find_rdataset(n + '.internal.', 'A')[0]) != ip]
+print('internal. zone agrees with banna hereEntries' if not missing else f'MISMATCH: {missing}')
 "
 
 # --- Unbound (local resolver): read-only generation; nothing installed or switched ---

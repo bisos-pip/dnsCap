@@ -78,7 +78,7 @@ class KnotInfo:
 
     # Knot listens on its own loopback address, port 53 --- not 127.0.0.1, which the
     # resolver takes (as tinydns and dnscache each had their own address). 127.0.0.53 is
-    # systemd-resolved's stub, and 127.0.22.x is banna's .here range.
+    # systemd-resolved's stub, and 127.0.22.x is banna's .internal range.
     listenIp: str = "127.0.53.1"
     listenPort: int = 53
 
@@ -103,14 +103,14 @@ knotInfo = KnotInfo()
 
 
 def hereZoneSpec() -> ZoneSpec:
-    """The here. zone: every banna .here name, at its stored hereIp.
+    """The internal. zone (banna tcpPorts.hereDomain): every banna here name, at its stored hereIp.
 
     The same source as the /etc/hosts dblock (bannaInfo.cs -i bannaForEtcHosts), so the
     two can be run side by side during migration and must agree.
     """
     from bisos.banna import tcpPorts
     return ZoneSpec(
-        domain="here",
+        domain=tcpPorts.hereDomain,
         records=tuple(ZoneRecord(hereName, "A", hereIp) for hereIp, hereName, _ in tcpPorts.hereEntries()),
     )
 
@@ -125,10 +125,10 @@ def intraZoneSpec() -> ZoneSpec:
 
 
 # The zones this host serves. Each entry is a function, so the data is read at generation time.
-# here. is served too, but only for testing Knot: .here resolves through /etc/hosts (loopback
+# internal. is served too, but only for testing Knot: .internal resolves through /etc/hosts (loopback
 # names are per-platform), and the resolver does not stub it here.
 zoneSpecFuncs: dict[str, typing.Callable[[], ZoneSpec]] = {
-    "here": hereZoneSpec,
+    "internal": hereZoneSpec,       # bisos.banna tcpPorts.hereDomain
     "intra": intraZoneSpec,
 }
 

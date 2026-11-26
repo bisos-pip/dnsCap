@@ -22,8 +22,8 @@ one ingredient — the DNS aspect — of a full *CBS* (Capability Bundle
 Specification), alongside sibling aspects such as =webCap= and =sbom=.
 
 Concretely, =dnsCap= supplies the DNS naming an application needs. Its first
-backend maintains =/etc/hosts= entries for the =.here= domain (e.g.
-=airflow.here=), using the =bisos.banna= dblock machinery to keep those
+backend maintains =/etc/hosts= entries for the =.internal= domain (e.g.
+=airflow.internal=), using the =bisos.banna= dblock machinery to keep those
 entries in sync.
 
 =dnsCap_seed.cs= is a seed. Common usages take the form of a
@@ -32,7 +32,7 @@ entries in sync.
 dnsCap also holds BISOS's DNS servers, as bedrock capabilities (decided 2026-10-10,
 bisos-pip/pals/palsWithBcm README.org 1.2): *Knot DNS* as the authoritative server, driven
 tinydns-style from generated zone files, and *Unbound* as each platform's local resolver,
-sending =.intra= to Knot. =.here= stays in =/etc/hosts=: its names are loopback addresses,
+sending =.intra= to Knot. =.internal= stays in =/etc/hosts=: its names are loopback addresses,
 meaningful only on the platform itself. See [[#knot-dns-and-unbound][Knot DNS and Unbound]].
 
 * Table of Contents     :TOC:
@@ -44,7 +44,7 @@ meaningful only on the platform itself. See [[#knot-dns-and-unbound][Knot DNS an
   - [[#installation-with-pip][Installation With pip]]
   - [[#installation-with-pipx][Installation With pipx]]
 - [[#usage][Usage]]
-  - [[#example-managing-airflowhere-in-etchosts][Example: managing airflow.here in /etc/hosts]]
+  - [[#example-managing-airflowhere-in-etchosts][Example: managing airflow.internal in /etc/hosts]]
   - [[#other-etchosts-blocks-and-work-before-the-update][Other /etc/hosts blocks, and work before the update]]
   - [[#commands][Commands]]
 - [[#knot-dns-and-unbound][Knot DNS and Unbound]]
@@ -94,7 +94,7 @@ and services. PyCS is an alternative to FastAPI, Typer and Click.
 bisos.dnsCap uses the PyCS-Framework to provide the DNS aspect of a BISOS
 Capability:
 
-1) Update =/etc/hosts= with the DNS entries for a =.here= fqdn (via the
+1) Update =/etc/hosts= with the DNS entries for a =.internal= fqdn (via the
    =bisos.banna= dblock machinery).
 2) Verify that =/etc/hosts= contains the expected banna dblock markers.
 3) Resolve and ping a managed fqdn to confirm the entry is in effect.
@@ -130,7 +130,7 @@ pipx install bisos.dnsCap
 
 * Usage
 
-** Example: managing airflow.here in /etc/hosts
+** Example: managing airflow.internal in /etc/hosts
 
 A plant such as =airflow-here-dns.pcs= names the fqdn and the DNS backend:
 
@@ -138,7 +138,7 @@ A plant such as =airflow-here-dns.pcs= names the fqdn and the DNS backend:
 from bisos.dnsCap import dnsCap_seedInfo
 cntrlInfo = dnsCap_seedInfo.cmndsControlInfo
 cntrlInfo.dnsSpecMethod = dnsCap_seedInfo.DnsSpecMethod.etcHosts
-cntrlInfo.fqdn = "airflow.here"
+cntrlInfo.fqdn = "airflow.internal"
 #+end_src
 
 With that plant in place, the full cycle is:
@@ -151,20 +151,20 @@ bin/airflow-here-dns.pcs -i dnsCap_update
 bin/airflow-here-dns.pcs -i dnsCap_verify
 
 # Resolve and ping the managed fqdn
-bin/airflow-here-dns.pcs -i dnsCap_resolve  airflow.here
-bin/airflow-here-dns.pcs -i dnsCap_fqdnPing airflow.here
+bin/airflow-here-dns.pcs -i dnsCap_resolve  airflow.internal
+bin/airflow-here-dns.pcs -i dnsCap_fqdnPing airflow.internal
 #+end_src
 
 After =dnsCap_update=, =/etc/hosts= contains a banna-generated block, e.g.:
 
 #+begin_src text
 ####+BEGIN: bx:dblock:global:run-result-stdout :command "bannaInfo.cs -i bannaForEtcHosts"
-127.0.22.100  airflow.here  # port=24006
+127.0.22.100  airflow.internal  # port=24006
 ...
 ####+END:
 #+end_src
 
-and =ping airflow.here= then resolves to =127.0.22.100=.
+and =ping airflow.internal= then resolves to =127.0.22.100=.
 
 ** Other /etc/hosts blocks, and work before the update
 
@@ -176,7 +176,7 @@ Two more control-info fields cover that; a plant that sets neither gets banna's 
 - =cntrlInfo.preUpdateFuncs= --- functions =dnsCap_update= calls first; one returning False fails the
   update before =/etc/hosts= is touched.
 
-bisos.pals's =pals-here-dns.spcs= sets both (=palsHere.dnsCapSetup()=): it adds the PALS's =.here=
+bisos.pals's =pals-here-dns.spcs= sets both (=palsHere.dnsCapSetup()=): it adds the PALS's =.internal=
 name to its list, then has its =127.0.55.x= block created and filled beside banna's.
 
 ** Commands
@@ -198,7 +198,7 @@ items: =AI-WorkPlan.org= Stage 4 (=<<knotStartingPoint>>=, =<<unboundStartingPoi
 
 | Names           | Scope         | Resolved by                                    |
 |-----------------+---------------+------------------------------------------------|
-| =.here=         | this platform | =/etc/hosts= (=dnsCap_update=, above)          |
+| =.internal=         | this platform | =/etc/hosts= (=dnsCap_update=, above)          |
 | =.intra=        | this site     | Unbound -> stub zone -> Knot (=127.0.53.1@53=) |
 | everything else | the world     | Unbound, full recursion with DNSSEC validation |
 
@@ -208,14 +208,14 @@ BISOS data is the single source. dnsCap generates plain zone files and =knot.con
 validates them (=kzonecheck=, =knotc conf-check=), installs them only when changed --- an
 unchanged zone keeps its SOA serial --- and publishes with =knotc zone-reload=. The server
 keeps no state of its own (=zonefile-load: whole=, =journal-content: none=,
-=zonefile-sync: -1=). Zones: =here.= (from banna, for testing only) and =intra.= (SOA/NS so
+=zonefile-sync: -1=). Zones: =internal.= (from banna, for testing only) and =intra.= (SOA/NS so
 far). Debian's =knot.service= is used as is.
 
 #+begin_src bash
 knot-sbom.pcs -i sbom_fullUpdate          # knot, knot-dnssecutils, knot-dnsutils; then publish
 knotDns.cs -i knotZoneStdout here         # a zone as it would be generated (writes nothing)
 knotDns.cs -i knotFullUpdate              # zones, then knot.conf
-knotDns.cs -i knotQuery kafka.here        # kdig @127.0.53.1
+knotDns.cs -i knotQuery kafka.internal        # kdig @127.0.53.1
 #+end_src
 
 ** Unbound --- the platform's local resolver
@@ -239,8 +239,8 @@ endpoint on Unbound (needs the platform CA, palsWithBcm 1.4) is the planned fix.
 * Key Files
 
 - =py3/bin/dnsCap_seed.cs= — the seed entry point.
-- =py3/bin/airflow-here-dns.pcs= — example plant for =airflow.here=.
-- =py3/bin/exmpl-here-dns.pcs= — example plant for =exmpl.here=.
+- =py3/bin/airflow-here-dns.pcs= — example plant for =airflow.internal=.
+- =py3/bin/exmpl-here-dns.pcs= — example plant for =exmpl.internal=.
 - =py3/bisos/dnsCap/dnsCap_csu.py= — the four =dnsCap_*= commands.
 - =py3/bisos/dnsCap/dnsCap_seedInfo.py= — =DnsSpecMethod= enum (=etcHosts=,
   =tinydns=) and the =fqdn= / =dnsSpecMethod= control info.
